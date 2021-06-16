@@ -14,7 +14,7 @@ public enum BlockType {
         this.textureName = textureName;
     }
 
-    TextureName getTextureName() {
+    public TextureName getTextureName() {
         return textureName;
     }
 }
