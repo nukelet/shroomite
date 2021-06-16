@@ -1,4 +1,4 @@
-package com.javasegfault.shroomite;
+package com.javasegfault.shroomite.editor;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
@@ -15,6 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.javasegfault.shroomite.BlockType;
+import com.javasegfault.shroomite.MainMenuScreen;
+import com.javasegfault.shroomite.Shroomite;
 import com.javasegfault.shroomite.util.Position;
 
 public class WorldEditorScreen extends ScreenAdapter {

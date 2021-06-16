@@ -1,6 +1,8 @@
-package com.javasegfault.shroomite;
+package com.javasegfault.shroomite.editor;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.javasegfault.shroomite.BlockType;
+import com.javasegfault.shroomite.Shroomite;
 import com.javasegfault.shroomite.util.Position;
 
 public class GridBlockImage extends Image {

@@ -1,8 +1,9 @@
-package com.javasegfault.shroomite;
+package com.javasegfault.shroomite.editor;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.javasegfault.shroomite.BlockType;
 
 public class StatusBarLabel extends Label {
     private List<String> toolsList;
