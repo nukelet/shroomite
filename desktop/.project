@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>lab07-desktop</name>
-	<comment>Project lab07-desktop created by Buildship.</comment>
+	<name>shroomite-desktop</name>
+	<comment>Project shroomite-desktop created by Buildship.</comment>
 	<projects>
 	</projects>
 	<buildSpec>
@@ -24,18 +24,7 @@
 		<link>
 			<name>assets</name>
 			<type>2</type>
-			<location>/mnt/storage/DATA/Faculdade/unicamp/mc322/grupo/lab07/core/assets</location>
+			<location>C:/Users/g_ara/Code/nukelets/shroomite/core/assets</location>
 		</link>
 	</linkedResources>
-	<filteredResources>
-		<filter>
-			<id>1621800349172</id>
-			<name></name>
-			<type>30</type>
-			<matcher>
-				<id>org.eclipse.core.resources.regexFilterMatcher</id>
-				<arguments>node_modules|.git|__CREATED_BY_JAVA_LANGUAGE_SERVER__</arguments>
-			</matcher>
-		</filter>
-	</filteredResources>
 </projectDescription>

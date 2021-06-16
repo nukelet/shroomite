@@ -1,2 +1,0 @@
-mc322/lab07/desktop/DesktopLauncher.java
- mc322.lab07.desktop.DesktopLauncher
