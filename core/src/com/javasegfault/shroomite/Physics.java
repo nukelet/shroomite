@@ -31,7 +31,7 @@ public class Physics {
 
     public void updatePositions() {
         for (int i = world.getWidth() - 1; i >= 0; i--) {
-            for  (int j = world.getHeight() - 1; j >= 0; j--) {
+            for (int j = world.getHeight() - 1; j >= 0; j--) {
                 Block block = world.getBlockAt(i, j);
 
                 if (block == null) {

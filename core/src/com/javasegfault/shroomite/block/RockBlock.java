@@ -7,22 +7,22 @@ import com.javasegfault.shroomite.TextureName;
 import com.javasegfault.shroomite.util.Position;
 
 public class RockBlock extends Block {
-	public RockBlock(Shroomite game, Position position) {
-		super(game, position);
-	}
+    public RockBlock(Shroomite game, Position position) {
+        super(game, position);
+    }
 
-	@Override
-	public BlockType getType() {
-		return BlockType.ROCK;
-	}
-	
-	@Override
-	public Texture getTexture() {
-		return Shroomite.textures.get(TextureName.ROCK);
-	}
-	
-	@Override
-	public String toString() {
-		return String.format("CobblestoneBlock(position=%s)", position.toString());
-	}
+    @Override
+    public BlockType getType() {
+        return BlockType.ROCK;
+    }
+
+    @Override
+    public Texture getTexture() {
+        return Shroomite.textures.get(TextureName.ROCK);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("CobblestoneBlock(position=%s)", position.toString());
+    }
 }

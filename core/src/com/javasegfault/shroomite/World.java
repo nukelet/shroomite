@@ -5,7 +5,6 @@ import com.javasegfault.shroomite.blocks.Rock;
 import com.javasegfault.shroomite.blocks.Sand;
 import com.javasegfault.shroomite.util.Position;
 
-
 public class World {
     private int width;
     private int height;
@@ -16,10 +15,10 @@ public class World {
         this.height = height;
         this.blocks = new Block[width][height];
     }
-    
+
     public World() {
-    	this(20, 20);
-    	
+        this(20, 20);
+
         for (int i = 0; i < 5; i++) {
             Position pos = new Position(10, 19 - i);
             Sand sandBlock = new Sand(pos, this);
@@ -50,13 +49,13 @@ public class World {
             System.err.printf("Invalid block add at %s: position not empty\n", pos);
         }
     }
-    
+
     private boolean isValidPosition(int x, int y) {
-    	return x >= 0 && y >= 0 && x < width && y < height;
+        return x >= 0 && y >= 0 && x < width && y < height;
     }
-    
+
     private boolean isValidPosition(Position position) {
-    	return isValidPosition(position.getX(), position.getY());
+        return isValidPosition(position.getX(), position.getY());
     }
 
     public Block getBlockAt(int x, int y) {
@@ -67,7 +66,7 @@ public class World {
             return blocks[x][y];
         }
     }
-    
+
     public Block getBlockAt(Position position) {
         return getBlockAt(position.getX(), position.getY());
     }

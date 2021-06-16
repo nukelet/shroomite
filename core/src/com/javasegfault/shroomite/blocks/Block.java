@@ -23,7 +23,7 @@ public abstract class Block {
         this.position = position;
         this.world = world;
     }
-    
+
     public Position getPosition() {
         return this.position;
     }
@@ -35,9 +35,9 @@ public abstract class Block {
     public boolean isUpdated() {
         return isUpdated;
     }
-    
+
     public abstract BlockType getType();
-    
+
     public abstract Texture getTexture();
 
     public void destroySelf() {

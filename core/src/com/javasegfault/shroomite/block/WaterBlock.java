@@ -7,22 +7,22 @@ import com.javasegfault.shroomite.TextureName;
 import com.javasegfault.shroomite.util.Position;
 
 public class WaterBlock extends Block {
-	public WaterBlock(Shroomite game, Position position) {
-		super(game, position);
-	}
+    public WaterBlock(Shroomite game, Position position) {
+        super(game, position);
+    }
 
-	@Override
-	public BlockType getType() {
-		return BlockType.WATER;
-	}
-	
-	@Override
-	public Texture getTexture() {
-		return Shroomite.textures.get(TextureName.WATER);
-	}
-	
-	@Override
-	public String toString() {
-		return String.format("WaterBlock(position=%s)", position.toString());
-	}
+    @Override
+    public BlockType getType() {
+        return BlockType.WATER;
+    }
+
+    @Override
+    public Texture getTexture() {
+        return Shroomite.textures.get(TextureName.WATER);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("WaterBlock(position=%s)", position.toString());
+    }
 }

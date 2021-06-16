@@ -12,15 +12,15 @@ public class Rock extends Block {
         super(position, world);
         movable = false;
     }
-    
+
     @Override
     public BlockType getType() {
-    	return BlockType.ROCK;
+        return BlockType.ROCK;
     }
-    
+
     @Override
     public Texture getTexture() {
-    	return Shroomite.textures.get(TextureName.ROCK);
+        return Shroomite.textures.get(TextureName.ROCK);
     }
 
     public void updateState() {

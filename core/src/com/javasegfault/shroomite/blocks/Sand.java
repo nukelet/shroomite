@@ -14,12 +14,12 @@ public class Sand extends Block {
 
     @Override
     public BlockType getType() {
-    	return BlockType.SAND;
+        return BlockType.SAND;
     }
-    
+
     @Override
     public Texture getTexture() {
-    	return Shroomite.textures.get(TextureName.SAND);
+        return Shroomite.textures.get(TextureName.SAND);
     }
 
     public void interact(Block block) {
