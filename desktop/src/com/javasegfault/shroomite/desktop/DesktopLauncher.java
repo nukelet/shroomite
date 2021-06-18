@@ -10,6 +10,7 @@ public class DesktopLauncher {
 		config.title = "Shroomite";
 		config.width = 800;
 		config.height = 600;
+        config.foregroundFPS = 120;
 		new LwjglApplication(new Shroomite(), config);
 	}
 }

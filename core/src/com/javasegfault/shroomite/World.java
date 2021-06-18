@@ -1,8 +1,8 @@
 package com.javasegfault.shroomite;
 
 import com.javasegfault.shroomite.blocks.Block;
-import com.javasegfault.shroomite.blocks.Rock;
-import com.javasegfault.shroomite.blocks.Sand;
+import com.javasegfault.shroomite.blocks.RockBlock;
+import com.javasegfault.shroomite.blocks.SandBlock;
 import com.javasegfault.shroomite.util.Position;
 
 public class World {
@@ -21,13 +21,13 @@ public class World {
 
         for (int i = 0; i < 5; i++) {
             Position pos = new Position(10, 19 - i);
-            Sand sandBlock = new Sand(pos, this);
+            SandBlock sandBlock = new SandBlock(pos, this);
             addBlock(sandBlock);
         }
 
         for (int i = 0; i < width; i++) {
             Position pos = new Position(i, 0);
-            Rock rockBlock = new Rock(pos, this);
+            RockBlock rockBlock = new RockBlock(pos, this);
             addBlock(rockBlock);
         }
     }
@@ -44,9 +44,14 @@ public class World {
     public void addBlock(Block block) {
         Position pos = block.getPosition();
         if (isValidPosition(pos)) {
-            blocks[pos.getX()][pos.getY()] = block;
+            if (getBlockAt(pos) != null) {
+                System.err.printf("Invalid block add at %s: position not empty\n", pos);
+                return;
+            } else {
+                blocks[pos.getX()][pos.getY()] = block;
+            }
         } else {
-            System.err.printf("Invalid block add at %s: position not empty\n", pos);
+            System.err.printf("Invalid block add at %s: invalid position\n", pos);
         }
     }
 
