@@ -3,39 +3,48 @@ package com.javasegfault.shroomite.editor;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.javasegfault.shroomite.BlockType;
 import com.javasegfault.shroomite.MainMenuScreen;
 import com.javasegfault.shroomite.Shroomite;
 import com.javasegfault.shroomite.util.Position;
 
 public class WorldEditorScreen extends ScreenAdapter {
-    private final Shroomite game;
-    private Stage stage;
+    public static final Position OUT_OF_GRID_POSITION = new Position(-1, -1);
 
-    private StatusBarLabel statusBarLabel;
-    private int gridWidth;
-    private int gridHeight;
-    private GridBlockImage gridBlockImages[][];
+    private final Shroomite game;
+    private Grid grid;
+    private String referencedFileName;
+    private Position lastMousePosition;
+    private final Stage stage;
+    private final Label referencedFileNameLabel;
+    private final List<String> toolsList;
+    private final GridTable gridTable;
+    private final List<BlockType> blockTypeList;
+    private final StatusBarLabel statusBarLabel;
 
     public WorldEditorScreen(final Shroomite game) {
         this.game = game;
 
-        stage = new Stage(new ScreenViewport());
+        FitViewport viewport = new FitViewport(800, 600);
+        stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
-        final List<String> toolsList = new List<String>(game.skin);
+        grid = new Grid();
+        gridTable = new GridTable(game.skin, this, grid);
+        gridTable.updateCellsDrawables();
+
+        toolsList = new List<String>(game.skin);
         toolsList.setItems(new String[] { "Pencil", "Eraser" });
         toolsList.addListener(new ChangeListener() {
             @Override
@@ -44,7 +53,7 @@ public class WorldEditorScreen extends ScreenAdapter {
             }
         });
 
-        final List<BlockType> blockTypeList = new List<BlockType>(game.skin);
+        blockTypeList = new List<BlockType>(game.skin);
         blockTypeList.setItems(BlockType.values());
         blockTypeList.addListener(new ChangeListener() {
             @Override
@@ -53,67 +62,51 @@ public class WorldEditorScreen extends ScreenAdapter {
             }
         });
 
-        gridWidth = 16;
-        gridHeight = 16;
-        gridBlockImages = new GridBlockImage[gridHeight][gridWidth];
-        for (int i = 0; i < gridHeight; i++) {
-            for (int j = 0; j < gridWidth; j++) {
-                Position gridBlockPosition = new Position(j, i);
-                final GridBlockImage image = new GridBlockImage(gridBlockPosition, null);
-                image.addListener(new ClickListener() {
-                    @Override
-                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                        if (toolsList.getSelected().equals("Pencil")) {
-                            image.setBlockType(blockTypeList.getSelected());
-                        } else if (toolsList.getSelected().equals("Eraser")) {
-                            image.setBlockType(null);
-                        }
+        lastMousePosition = OUT_OF_GRID_POSITION;
 
-                        return true;
-                    }
+        statusBarLabel = new StatusBarLabel(game.skin, this);
 
-                    @Override
-                    public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                        if (!(toActor instanceof GridBlockImage)) {
-                            statusBarLabel.setMousePosition(-1, -1);
-                            statusBarLabel.updateText();
-                            return;
-                        }
+        referencedFileNameLabel = new Label(null, game.skin);
+        setReferencedFileName("worlds/untitled.grid");
 
-                        GridBlockImage toImage = (GridBlockImage) toActor;
-
-                        statusBarLabel.setMousePosition(toImage.getPosition().getX(), toImage.getPosition().getY());
-                        statusBarLabel.updateText();
-
-                        if (pointer == -1)
-                            return;
-
-                        if (toolsList.getSelected().equals("Pencil")) {
-                            toImage.setBlockType(blockTypeList.getSelected());
-                        } else if (toolsList.getSelected().equals("Eraser")) {
-                            toImage.setBlockType(null);
-                        }
-                    }
-                });
-                gridBlockImages[j][i] = image;
-            }
-        }
+        createNewGrid(16, 16);
 
         // Tabela base da interface
         Table table = new Table();
         table.setFillParent(true);
         stage.addActor(table);
-        // table.setDebug(true);
 
         // Barra de menu superior
-        final TextButton newFileButton = new TextButton("New", game.skin);
+        final TextButton newGridButton = new TextButton("New", game.skin);
+        newGridButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                NewGridDialog newGridDialog = new NewGridDialog(game.skin, WorldEditorScreen.this);
+                newGridDialog.show(stage);
+            }
+        });
         final TextButton openFileButton = new TextButton("Open", game.skin);
+        openFileButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                OpenGridFromFileDialog openGridFromFileDialog = new OpenGridFromFileDialog(game.skin, WorldEditorScreen.this);
+                openGridFromFileDialog.show(stage);
+            }
+        });
         final TextButton saveFileButton = new TextButton("Save", game.skin);
+        saveFileButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                SaveGridToFileDialog saveDialog = new SaveGridToFileDialog(game.skin, WorldEditorScreen.this);
+                saveDialog.show(stage);
+            }
+        });
         final TextButton clearGridButton = new TextButton("Clear", game.skin);
         clearGridButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                clearGridBlockImages();
+                ClearGridDialog clearGridDialog = new ClearGridDialog(game.skin, WorldEditorScreen.this);
+                clearGridDialog.show(stage);
             }
         });
         final TextButton exitButton = new TextButton("Exit", game.skin);
@@ -125,11 +118,12 @@ public class WorldEditorScreen extends ScreenAdapter {
             }
         });
         final HorizontalGroup menuBarGroup = new HorizontalGroup();
-        menuBarGroup.addActor(newFileButton);
+        menuBarGroup.addActor(newGridButton);
         menuBarGroup.addActor(openFileButton);
         menuBarGroup.addActor(saveFileButton);
         menuBarGroup.addActor(clearGridButton);
         menuBarGroup.addActor(exitButton);
+        menuBarGroup.addActor(referencedFileNameLabel);
         menuBarGroup.space(10);
         table.add(menuBarGroup).colspan(3).left();
 
@@ -139,13 +133,6 @@ public class WorldEditorScreen extends ScreenAdapter {
         table.add(toolbarPane).align(Align.topLeft).width(100).pad(40, 0, 40, 0);
 
         // Área central, onde fica a grid
-        Table gridTable = new Table(game.skin);
-        for (int i = gridHeight - 1; i >= 0; i--) {
-            for (int j = 0; j < gridWidth; j++) {
-                gridTable.add(gridBlockImages[j][i]).grow();
-            }
-            gridTable.row();
-        }
         table.add(gridTable).grow();
 
         // Menu lateral de seleção de blocos
@@ -154,8 +141,6 @@ public class WorldEditorScreen extends ScreenAdapter {
 
         // Barra de status
         table.row();
-        statusBarLabel = new StatusBarLabel(game.skin, toolsList, blockTypeList, gridWidth, gridHeight, -1, -1);
-        statusBarLabel.updateText();
         final HorizontalGroup statusBar = new HorizontalGroup();
         statusBar.addActor(statusBarLabel);
         table.add(statusBar).left().colspan(3);
@@ -178,11 +163,70 @@ public class WorldEditorScreen extends ScreenAdapter {
         stage.dispose();
     }
 
-    private void clearGridBlockImages() {
-        for (int i = 0; i < gridHeight; i++) {
-            for (int j = 0; j < gridWidth; j++) {
-                gridBlockImages[j][i].setBlockType(null);
-            }
-        }
+    public int getGridWidth() {
+        return grid.getWidth();
+    }
+
+    public int getGridHeight() {
+        return grid.getHeight();
+    }
+
+    public Position getLastMousePosition() {
+        return lastMousePosition;
+    }
+
+    public void setLastMousePosition(Position mousePosition) {
+        this.lastMousePosition = mousePosition;
+    }
+
+    public void updateStatusBarLabelText() {
+        statusBarLabel.updateText();
+    }
+
+    public String getSelectedTool() {
+        return toolsList.getSelected();
+    }
+
+    public BlockType getSelectedBlockType() {
+        return blockTypeList.getSelected();
+    }
+
+    public String getReferencedFileName() {
+        return referencedFileName;
+    }
+
+    public void setReferencedFileName(String referencedFileName) {
+        this.referencedFileName = referencedFileName;
+        updateReferencedFileNameLabelText();
+    }
+
+    public void createNewGrid(int gridWidth, int gridHeight) {
+        grid = new Grid(gridWidth, gridHeight);
+        gridTable.setGrid(grid);
+        gridTable.updateCellsDrawables();
+        statusBarLabel.updateText();
+        setReferencedFileName("worlds/untitled.grid");
+    }
+
+    public void loadGrid(String fileName) {
+        grid.loadState(fileName);
+        gridTable.setGrid(grid);
+        gridTable.updateCellsDrawables();
+        statusBarLabel.updateText();
+        setReferencedFileName(fileName);
+    }
+
+    public void saveGrid(String fileName) {
+        grid.saveState(fileName);
+        setReferencedFileName(fileName);
+    }
+
+    public void clearGrid() {
+        grid.clear();
+        gridTable.updateCellsDrawables();
+    }
+
+    private void updateReferencedFileNameLabelText() {
+        referencedFileNameLabel.setText(referencedFileName.substring(referencedFileName.lastIndexOf("/") + 1));
     }
 }
