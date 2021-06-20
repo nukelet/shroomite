@@ -7,27 +7,28 @@ import com.javasegfault.shroomite.TextureName;
 import com.javasegfault.shroomite.World;
 import com.javasegfault.shroomite.util.Position;
 
-public class Rock extends Block {
-    public Rock(Position position, World world) {
+public class LavaBlock extends Block {
+	public LavaBlock(Position position, World world) {
         super(position, world);
-        movable = false;
-    }
+	}
+
+	@Override
+	public BlockType getType() {
+		return BlockType.LAVA;
+	}
+	
+	@Override
+	public Texture getTexture() {
+		return Shroomite.textures.get(TextureName.LAVA);
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("LavaBlock(position=%s)", position.toString());
+	}
 
     @Override
-    public BlockType getType() {
-        return BlockType.ROCK;
-    }
-
-    @Override
-    public Texture getTexture() {
-        return Shroomite.textures.get(TextureName.ROCK);
-    }
-
-    public void updateState() {
-        this.isUpdated = true;
-    }
-
     public void interact(Block block) {
-        return;
+
     }
 }

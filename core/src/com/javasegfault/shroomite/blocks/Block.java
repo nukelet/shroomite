@@ -6,8 +6,9 @@ import com.javasegfault.shroomite.World;
 import com.javasegfault.shroomite.util.Position;
 
 public abstract class Block {
-    protected Position position;
     protected World world;
+	protected Position position;
+
     public boolean isUpdated;
 
     // whether the block interacts with other blocks
@@ -18,9 +19,9 @@ public abstract class Block {
     // whether the block is part of a rigid body (in case we want
     // to do stuff with Box2D later)
     public boolean rigid = false;
-
-    public Block(Position position, World world) {
-        this.position = position;
+	
+	public Block(Position position, World world) {
+		this.position = position;
         this.world = world;
     }
 
@@ -28,17 +29,23 @@ public abstract class Block {
         return this.position;
     }
 
-    public void setPosition(Position position) {
-        this.position = position;
+    private void setPosition(Position pos) {
+        this.position = pos;
     }
+	
+	public abstract BlockType getType();
+	
+	public abstract Texture getTexture();
 
-    public boolean isUpdated() {
-        return isUpdated;
+    // TODO: this should probably be delegated to the graphics component
+    // maybe the block should only store a reference to a TextureName object
+	// public void render() {
+	// 	game.drawBlockRegion(getTexture(), position.getX(), position.getY());
+	// }
+
+    public void render() {
+
     }
-
-    public abstract BlockType getType();
-
-    public abstract Texture getTexture();
 
     public void destroySelf() {
         world.removeBlock(this);
@@ -59,7 +66,4 @@ public abstract class Block {
         setPosition(pos);
         world.addBlock(this);
     }
-
-    // gotta implement stuff like move(), interact(Block block), destroy(), ...
-    // these would be used by the physics engine
 }
