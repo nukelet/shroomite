@@ -31,4 +31,8 @@ public class LavaBlock extends Block {
     public void interact(Block block) {
 
     }
+
+    public void accept(BlockVisitorInterface visitor) {
+        visitor.visitLavaBlock(this);
+    }
 }

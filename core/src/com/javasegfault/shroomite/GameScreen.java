@@ -11,6 +11,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.javasegfault.shroomite.blocks.Block;
@@ -22,6 +26,7 @@ import com.javasegfault.shroomite.blocks.WaterBlock;
 import com.javasegfault.shroomite.blocks.WoodBlock;
 import com.javasegfault.shroomite.util.Position;
 import com.javasegfault.shroomite.Shroomite;
+import com.javasegfault.shroomite.agents.PlayerAgent;
 
 public class GameScreen extends ScreenAdapter {
 	private final Shroomite game;
@@ -39,29 +44,13 @@ public class GameScreen extends ScreenAdapter {
 
     private World world = new World(GRID_WIDTH, GRID_HEIGHT);
     private Physics physics = new Physics(world);
-	
-	// Código anterior
-//	World world;
-//    Physics physics;
-//    ShapeRenderer shapeRenderer;
+    private PlayerAgent player = new PlayerAgent(world, new Vector2(3.0f * BLOCK_WIDTH, 20.0f * BLOCK_HEIGHT));
 
     public GameScreen(final Shroomite game) {
-        // Código anterior
-//		shapeRenderer = new ShapeRenderer();
-//        world = new World();
-//        physics = new Physics(world);
-		
-		
 		this.game = game;
 		
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 600);
-        
-        // TODO: hard-coded
-        // also this creates problems when the division is
-        // rounded down :/
-        // BLOCK_WIDTH = 800 / GRID_WIDTH;
-        // BLOCK_HEIGHT = 600 / GRID_HEIGHT;
 		
 		generateWorld();
 		lastClickedBlock = null;
@@ -69,58 +58,42 @@ public class GameScreen extends ScreenAdapter {
 	
 	@Override
 	public void render(float delta) {
-		// Código anterior
-//		// update physics
-//        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-//            physics.updateInteractions();
-//            physics.updatePositions();
-//        }
-//        
-		// ScreenUtils.clear(0, 0, 0, 1);
-
-        // camera.update();
-        // shapeRenderer.setProjectionMatrix(camera.combined);
-        // shapeRenderer.begin(ShapeType.Line);
-        // shapeRenderer.setColor(1, 1, 1, 1);
-
-        // for (int i = 0; i < world.getWidth(); i++) {
-            // shapeRenderer.line(40*i, 0, 40*i, 800);
-        // }
-
-        // for (int j = 0; j < world.getHeight(); j++) {
-            // shapeRenderer.line(0, 40*j, 800, 40*j);
-        // }
-
-        // shapeRenderer.end();
-//
-//		batch.begin();
-//
-//        for (int i = 0; i < world.getWidth(); i++) {
-//            for (int j = 0; j < world.getHeight(); j++) {
-//                Block block = world.getBlockAt(i, j);
-//                if (block != null) {
-//                    Position pos = block.getPosition();
-//                    batch.draw(block.getTexture(), 40*pos.getX(), 40*pos.getY(), 40, 40);
-//                }
-//            }
-//        }
-//        
-//		batch.end();
-		
 		ScreenUtils.clear(0, 0, 0.2f, 1);
 		camera.update();
 		game.batch.setProjectionMatrix(camera.combined);
         shapeRenderer.setProjectionMatrix(camera.combined);
 		handleInput();
+        physics.updatePlayer(player, delta);
 
         game.batch.begin();
 		renderWorld();
         float fps = 1/Gdx.graphics.getDeltaTime();
         font.draw(game.batch, String.format("%.2f", fps), 50, 500);
+
+        font.draw(game.batch,String.format("velocity: (%.2f, %.2f)",
+                    player.getSpeed().x, player.getSpeed().y), 300, 500);
+        
+        Array<Block> collidingBlocks = physics.getCollidingBlocks(player);
+        for (Block block : collidingBlocks) {
+            game.drawBlockRegion(Shroomite.textures.get(TextureName.WATER_CRITICAL),
+                    block.getPosition().getX(), block.getPosition().getY());
+        }
+
+        // bottom left corner coordinates
+        Vector2 pos = player.getPosition();
+        int gridPosX0 = (int) (pos.x/(float) BLOCK_WIDTH);
+        int gridPosY0 = (int) (pos.y/(float) BLOCK_HEIGHT);
+        font.draw(game.batch,String.format("grid position: (%d, %d)", gridPosX0, gridPosY0), 600, 500);
+
+        float playerX = player.getPosition().x;
+        float playerY = player.getPosition().y;
+        game.batch.draw(player.getTexture(), playerX, playerY,
+                player.getTextureWidth(), player.getTextureHeight());
+
 		game.batch.end();
 
         shapeRenderer.begin(ShapeType.Line);
-        shapeRenderer.setColor(1, 1, 1, 1);
+        shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         for (int x = 0; x < GRID_WIDTH * BLOCK_WIDTH; x++) {
             shapeRenderer.line(BLOCK_WIDTH*x, 0, BLOCK_WIDTH*x, 800);
@@ -130,6 +103,8 @@ public class GameScreen extends ScreenAdapter {
             shapeRenderer.line(0, BLOCK_HEIGHT*y, 800, BLOCK_HEIGHT*y);
         }
 
+        shapeRenderer.setColor(1f, 1f, 1f, 1f);
+        shapeRenderer.rect(pos.x, pos.y, player.getWidth(), player.getHeight());
         shapeRenderer.end();
 	}
 	
@@ -162,108 +137,76 @@ public class GameScreen extends ScreenAdapter {
             world.addBlock(new RockBlock(rightVertical, world));
         }
 
-        for (int y = world.getHeight() - 1; y >= world.getHeight() - 40; y--) {
-            // Position pos = new Position(world.getWidth() / 2, y);
-            // world.addBlock(new SandBlock(pos, world));
-            // world.addBlock(new SandBlock(pos.right(), world));
-            // world.addBlock(new SandBlock(pos.left(), world));
-            
-            // Position pos2 = pos.add(new Position(8, 0));
-            // world.addBlock(new SandBlock(pos2, world));
-            // world.addBlock(new SandBlock(pos2.right(), world));
-            // world.addBlock(new SandBlock(pos2.left(), world));
-
-            // Position pos3 = pos.add(new Position(-8, 0));
-            // world.addBlock(new SandBlock(pos3, world));
-            // world.addBlock(new SandBlock(pos3.right(), world));
-            // world.addBlock(new SandBlock(pos3.left(), world));
-
-            // Position pos = new Position(world.getWidth() / 2, y);
-            // world.addBlock(new WaterBlock(pos, world));
-            // world.addBlock(new WaterBlock(pos.right(), world));
-            // world.addBlock(new WaterBlock(pos.left(), world));
-        }
-
-        for (int x = GRID_WIDTH / 2; x < GRID_WIDTH / 2 + 1; x++) {
-            for (int y = GRID_HEIGHT - 8; y < GRID_HEIGHT - 1; y++) {
+        for (int x = GRID_WIDTH / 2 - 10; x < GRID_WIDTH / 2 + 10; x++) {
+            for (int y = GRID_HEIGHT - 10; y < GRID_HEIGHT - 1; y++) {
                 Position pos = new Position(x, y);
                 world.addBlock(new WaterBlock(pos, world));
-                world.addBlock(new WaterBlock(pos.right(), world));
-                world.addBlock(new WaterBlock(pos.left(), world));
             }
+        }
+
+        for (int x = 0; x < 11; x++) {
+            Position pos = new Position(x+4, x+14);
+            world.addBlock(new RockBlock(pos, world));
         }
     }
 	
-	// private void generateWorld() {
-	// 	Random rand = new Random();
-		
-	// 	for (int i = 0; i < GRID_HEIGHT; i++) {
-	// 		for (int j = 0; j < GRID_WIDTH; j++) {
-	// 			switch (i) {
-	// 			case 7:
-	// 			case 6:
-	// 			case 5:
-	// 				if (j == 2 || j == 7 || j == 10) {
-	// 					WoodBlock woodBlock = new WoodBlock(game, new Position(j, i));
-	// 					// há 20% de chance de um bloco de madeira nascer pegando fogo
-	// 					if (rand.nextFloat() < 0.2f) {
-	// 						woodBlock.setOnFire(true);
-	// 					}
-	// 					blocks[i][j] = woodBlock;
-	// 				} else {
-	// 					blocks[i][j] = null;							
-	// 				}
-	// 				break;
-	// 			case 4:
-	// 				blocks[i][j] = new DirtBlock(game, new Position(j, i));
-	// 				break;
-	// 			case 3:
-	// 				blocks[i][j] = new WaterBlock(game, new Position(j, i));
-	// 				break;
-	// 			case 2:
-	// 				blocks[i][j] = new SandBlock(game, new Position(j, i));
-	// 				break;
-	// 			case 1:
-	// 				blocks[i][j] = new RockBlock(game, new Position(j, i));
-	// 				break;
-	// 			case 0:
-	// 				blocks[i][j] = new LavaBlock(game, new Position(j, i));
-	// 				break;
-	// 			default:
-	// 				blocks[i][j] = null;
-	// 				break;
-	// 			}
-	// 		}
-	// 	}
-	// }
-	
     private long lastPhysicsCallTime = 0;
-    // TODO: this is broken and needs to be fixed
-	private void handleInput() {
-        // there is a problem here -- this depends on the size of the window
-		if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
-            float screenWidth = Gdx.graphics.getWidth();
-            float screenHeight = Gdx.graphics.getHeight();
+    private long lastMousePressTime = 0;
 
-			int posX = (int) ((Gdx.input.getX()/screenWidth) * BLOCK_WIDTH);
-			float posY = (Gdx.graphics.getHeight() - Gdx.input.getY())/Gdx.graphics.getHeight();
-            // System.out.println("x = " + posX + ", y = " + posY);
-            // System.out.println("x = " + Gdx.input.getX() + ", y = " + Gdx.input.getY());
-            // System.out.printf("width: %d, height: %d\n", Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-			// if (posX >= 0 && posX < GRID_WIDTH && posY >= 0 && posY < GRID_HEIGHT) {
-			// 	Block clickedBlock = world.getBlockAt(posX, posY);
-			// 	if (clickedBlock != null && clickedBlock != lastClickedBlock) {
-			// 		System.out.println(clickedBlock);
-			// 		lastClickedBlock = clickedBlock;
-			// 	}
-			// }
+	private void handleInput() {
+		if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
+            long currentTime = TimeUtils.millis();
+
+            Vector3 mousePos = new Vector3(0, 0, 0);
+            mousePos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+            camera.unproject(mousePos);
+            System.out.println("x = " + mousePos.x + ", y = " + mousePos.y);
+            int mouseWorldPosX = (int) (mousePos.x / BLOCK_WIDTH);
+            int mouseWorldPosY = (int) (mousePos.y / BLOCK_HEIGHT);
+            if (currentTime - lastMousePressTime > 500) {
+                System.out.println("world coordinates: x = " + mouseWorldPosX + ", y = " + mouseWorldPosY);
+                System.out.println(world.getBlockAt(mouseWorldPosX, mouseWorldPosY));
+                lastMousePressTime = currentTime;
+            }
 		}
 
-        if (Gdx.input.isKeyPressed(Keys.SPACE)) {
+        if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)) {
             long currentTime = TimeUtils.millis();
-            if (currentTime - lastPhysicsCallTime > 100) {
+            if (currentTime - lastPhysicsCallTime > 17) {
                 physics.updatePositions();
                 lastPhysicsCallTime = TimeUtils.millis();
+            }
+        }
+
+        /*
+         * 5 blocks
+         * 5*BLOCK_HEIGHT
+         * v0^2/2a = 5*BLOCK_HEIGHT
+         *
+         * */
+        if (Gdx.input.isKeyPressed(Keys.SPACE) && player.speed.y == 0) {
+            player.setSpeed(player.speed.x, 400);
+        }
+        
+        float speedX = 250;
+        if (Gdx.input.isKeyPressed(Keys.D)) {
+            player.setSpeed(speedX, player.speed.y);
+        } else if (Gdx.input.isKeyPressed(Keys.A)) {
+            player.setSpeed(-speedX, player.speed.y);
+        } else {
+            player.setSpeed(0, player.speed.y);
+        }
+
+        boolean noClip = false;
+        if (noClip) {
+
+            float speedY = 250;
+            if (Gdx.input.isKeyPressed(Keys.W)) {
+                player.setSpeed(player.speed.x, speedY);
+            } else if (Gdx.input.isKeyPressed(Keys.S)) {
+                player.setSpeed(player.speed.x, -speedY);
+            } else {
+                player.setSpeed(player.speed.x, 0);
             }
         }
 	}
@@ -276,20 +219,19 @@ public class GameScreen extends ScreenAdapter {
 					Texture texture = block.getTexture();
                     Position pos = block.getPosition();
                     game.drawBlockRegion(texture, pos.getX(), pos.getY());
-
 				} else {
 					// desenha a textura padrão para a altura correspondente
-					Texture texture = null;
-					if (j == 15 || j == 14) {
-						texture = Shroomite.textures.get(TextureName.SKY_1);
-					} else if (j == 13) {
-						texture = Shroomite.textures.get(TextureName.SKY_2);
-					} else if (j == 12) {
-						texture = Shroomite.textures.get(TextureName.SKY_3);
-					} else {
-						texture = Shroomite.textures.get(TextureName.SKY_4);
-					}
-					drawBlockRegion(texture, i, j);
+					// Texture texture = null;
+					// if (j == 15 || j == 14) {
+					// 	texture = Shroomite.textures.get(TextureName.SKY_1);
+					// } else if (j == 13) {
+					// 	texture = Shroomite.textures.get(TextureName.SKY_2);
+					// } else if (j == 12) {
+					// 	texture = Shroomite.textures.get(TextureName.SKY_3);
+					// } else {
+					// 	texture = Shroomite.textures.get(TextureName.SKY_4);
+					// }
+					// drawBlockRegion(texture, i, j);
 				}
 			}
 		}

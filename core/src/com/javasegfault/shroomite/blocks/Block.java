@@ -5,9 +5,10 @@ import com.javasegfault.shroomite.BlockType;
 import com.javasegfault.shroomite.World;
 import com.javasegfault.shroomite.util.Position;
 
-public abstract class Block {
+public abstract class Block implements BlockInterface {
     protected World world;
 	protected Position position;
+    protected BlockVisitorInterface visitor;
 
     public boolean isUpdated;
 
@@ -19,6 +20,8 @@ public abstract class Block {
     // whether the block is part of a rigid body (in case we want
     // to do stuff with Box2D later)
     public boolean rigid = false;
+    public boolean solid = true;
+    public boolean liquid = false;
 	
 	public Block(Position position, World world) {
 		this.position = position;

@@ -31,4 +31,8 @@ public class RockBlock extends Block {
     public void interact(Block block) {
 
     }
+
+    public void accept(BlockVisitorInterface visitor) {
+        visitor.visitRockBlock(this);
+    }
 }

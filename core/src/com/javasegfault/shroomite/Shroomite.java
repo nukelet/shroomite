@@ -14,10 +14,10 @@ public class Shroomite extends Game {
 	// public static final int BLOCK_HEIGHT = 10;
 	// public static final int GRID_WIDTH = 80;
 	// public static final int GRID_HEIGHT = 60;
-	public static final int BLOCK_WIDTH = 32;
-	public static final int BLOCK_HEIGHT = 32;
-	public static final int GRID_WIDTH = 16;
-	public static final int GRID_HEIGHT = 16;
+	public static final int BLOCK_WIDTH = 16;
+	public static final int BLOCK_HEIGHT = 16;
+	public static final int GRID_WIDTH = 32;
+	public static final int GRID_HEIGHT = 32;
 	
 	public SpriteBatch batch;
 	

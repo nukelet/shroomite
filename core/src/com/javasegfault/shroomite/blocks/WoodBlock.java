@@ -50,4 +50,8 @@ public class WoodBlock extends Block {
     public void interact(Block block) {
 
     }
+
+    public void accept(BlockVisitorInterface visitor) {
+        visitor.visitWoodBlock(this);
+    }
 }

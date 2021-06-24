@@ -33,6 +33,14 @@ public class Position {
 	public void setY(int y) {
 		this.y = y;
 	}
+
+    public boolean isEqual(int x, int y) {
+        return this.x == x && this.y == y;
+    }
+
+    public boolean isEqual(Position pos) {
+        return isEqual(pos.getX(), pos.getY());
+    }
 	
 	public Position add(Position pos) {
         return new Position(x + pos.getX(), y + pos.getY());

@@ -9,12 +9,18 @@ public enum TextureName {
     CLOUDS("clouds"),
     FIRE("fire"),
     WATER("water"),
+    WATER_FULL("water_full"),
+    WATER_THREE_QUARTERS("water_three_quarters"),
+    WATER_HALF("water_half"),
+    WATER_ONE_QUARTER("water_one_quarter"),
+    WATER_CRITICAL("water_critical"),
     SAND("sand"),
     LAVA("lava"),
     DIRT("dirt"),
     ROCK("rock"),
     WOOD("wood"),
-    SKY_WITH_CLOUDS("sky-with-clouds");
+    SKY_WITH_CLOUDS("sky-with-clouds"),
+    ADVENTURER_IDLE("adventurer-idle-00");
 
     private String assetName;
 
