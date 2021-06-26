@@ -13,7 +13,7 @@ public abstract class Agent implements AgentInterface {
     // position measured from bottom left corner
     Vector2 position;
     World world;
-    BlockVisitorInterface blockVisitor;
+    BlockVisitorInterface agentBlockVisitor;
     // separate the hitbox rectangle from the texture rectangle
     Rectangle hitbox;
     private final float HITBOX_WIDTH;
@@ -49,7 +49,7 @@ public abstract class Agent implements AgentInterface {
     }
 
     public void interact(Block block) {
-        block.accept(blockVisitor);
+        block.accept(agentBlockVisitor);
     }
 
     // TODO: change this to setPosition

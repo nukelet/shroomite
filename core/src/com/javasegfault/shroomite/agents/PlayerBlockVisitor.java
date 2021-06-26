@@ -14,7 +14,7 @@ public class PlayerBlockVisitor implements BlockVisitorInterface {
     }
 
     public void visitWaterBlock(WaterBlock block) {
-
+        // block.destroySelf();
     }
 
     public void visitDirtBlock(DirtBlock block) {

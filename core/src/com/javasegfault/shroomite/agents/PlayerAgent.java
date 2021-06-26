@@ -9,6 +9,7 @@ public class PlayerAgent extends Agent {
     public PlayerAgent(World world, Vector2 position) {
         super(world, position);
         this.speed = new Vector2(0, 0);
+        this.agentBlockVisitor = new PlayerBlockVisitor();
     }
 
     public void setSpeed(Vector2 speed) {

@@ -1,5 +1,7 @@
 package com.javasegfault.shroomite;
 
+import java.io.File;
+import java.util.List;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
@@ -54,11 +56,17 @@ public class GameScreen extends ScreenAdapter {
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 600);
 		
-		generateWorld();
+		// generateWorld();
+
+        // for some reason the "./" path is defaulted to the assets folder
+        String fileName = "test.grid";
+        world = WorldGenerator.generateWorld("worlds/" + fileName);
 		lastClickedBlock = null;
+
+        physics = new Physics(world);
 	}
 	
-	@Override
+        @Override
 	public void render(float delta) {
 		ScreenUtils.clear(0, 0, 0.2f, 1);
 		camera.update();
@@ -142,8 +150,13 @@ public class GameScreen extends ScreenAdapter {
         for (int x = GRID_WIDTH / 2 - 10; x < GRID_WIDTH / 2 + 10; x++) {
             for (int y = GRID_HEIGHT - 10; y < GRID_HEIGHT - 1; y++) {
                 Position pos = new Position(x, y);
-                world.addBlock(new WaterBlock(pos, world));
+                world.addBlock(new LavaBlock(pos, world));
             }
+        }
+
+        for (int x = 0; x < GRID_WIDTH; x++) {
+            Position pos = new Position(x, 1);
+            world.addBlock(new LavaBlock(pos, world));
         }
 
         for (int x = 0; x < 11; x++) {
@@ -167,8 +180,17 @@ public class GameScreen extends ScreenAdapter {
             int mouseWorldPosY = (int) (mousePos.y / BLOCK_HEIGHT);
             if (currentTime - lastMousePressTime > 500) {
                 System.out.println("world coordinates: x = " + mouseWorldPosX + ", y = " + mouseWorldPosY);
-                System.out.println(world.getBlockAt(mouseWorldPosX, mouseWorldPosY));
+                Block block = world.getBlockAt(mouseWorldPosX, mouseWorldPosY);
+                System.out.println(block);
                 lastMousePressTime = currentTime;
+                // if (block != null && block.getType() == BlockType.WATER) {
+                //     Position pos = block.getPosition();
+
+                //     System.out.println(world.getBlockAt(pos.up()));
+                //     System.out.println(world.getBlockAt(pos.down()));
+                //     System.out.println(world.getBlockAt(pos.left()));
+                //     System.out.println(world.getBlockAt(pos.right()));
+                // }
             }
 		}
 
@@ -176,6 +198,7 @@ public class GameScreen extends ScreenAdapter {
             long currentTime = TimeUtils.millis();
             if (currentTime - lastPhysicsCallTime > 17) {
                 physics.updatePositions();
+                physics.updateInteractions();
                 lastPhysicsCallTime = TimeUtils.millis();
             }
         }
@@ -200,8 +223,9 @@ public class GameScreen extends ScreenAdapter {
         }
 
         boolean noClip = false;
+        // boolean noClip = true;
         if (noClip) {
-
+            physics.gravity = 0;
             float speedY = 250;
             if (Gdx.input.isKeyPressed(Keys.W)) {
                 player.setSpeed(player.speed.x, speedY);

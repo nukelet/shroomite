@@ -65,7 +65,7 @@ public class World {
 
     public Block getBlockAt(int x, int y) {
         if (!isValidPosition(x, y)) {
-            System.err.printf("Invalid access to position Position(x=%d, y=%d): out of bounds\n", x, y);
+            // System.err.printf("Invalid access to position Position(x=%d, y=%d): out of bounds\n", x, y);
             return null;
         } else {
             return blocks[x][y];
