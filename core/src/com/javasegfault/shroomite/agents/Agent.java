@@ -7,13 +7,13 @@ import com.javasegfault.shroomite.Shroomite;
 import com.javasegfault.shroomite.TextureName;
 import com.javasegfault.shroomite.World;
 import com.javasegfault.shroomite.blocks.Block;
-import com.javasegfault.shroomite.blocks.BlockVisitorInterface;
+import com.javasegfault.shroomite.blocks.IBlockVisitor;
 
-public abstract class Agent implements AgentInterface {
+public abstract class Agent implements IAgent {
     // position measured from bottom left corner
     Vector2 position;
     World world;
-    BlockVisitorInterface agentBlockVisitor;
+    IBlockVisitor agentBlockVisitor;
     // separate the hitbox rectangle from the texture rectangle
     Rectangle hitbox;
     private final float HITBOX_WIDTH;

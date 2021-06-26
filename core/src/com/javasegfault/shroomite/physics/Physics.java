@@ -7,7 +7,7 @@ import com.javasegfault.shroomite.blocks.WaterBlock;
 import com.javasegfault.shroomite.util.Position;
 import com.javasegfault.shroomite.World;
 import com.javasegfault.shroomite.blocks.BlockType;
-import com.javasegfault.shroomite.blocks.BlockVisitorInterface;
+import com.javasegfault.shroomite.blocks.IBlockVisitor;
 import com.javasegfault.shroomite.blocks.LiquidBlock;
 import com.javasegfault.shroomite.Shroomite;
 import com.badlogic.gdx.math.Vector2;
@@ -20,7 +20,7 @@ public class Physics {
     public ObjectSet<LiquidBlock> newLiquidBlocks;
     Array<Block> collidingBlocks;
 
-    BlockVisitorInterface updateBlockPositionVisitor;
+    IBlockVisitor updateBlockPositionVisitor;
 
     public float gravity = -1000f;
 

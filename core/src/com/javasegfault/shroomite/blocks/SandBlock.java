@@ -35,7 +35,7 @@ public class SandBlock extends Block {
     }
 
     @Override
-    public void accept(BlockVisitorInterface visitor) {
+    public void accept(IBlockVisitor visitor) {
         visitor.visitSandBlock(this);
     }
 }

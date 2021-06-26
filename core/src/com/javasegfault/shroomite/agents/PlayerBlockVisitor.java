@@ -1,6 +1,6 @@
 package com.javasegfault.shroomite.agents;
 
-import com.javasegfault.shroomite.blocks.BlockVisitorInterface;
+import com.javasegfault.shroomite.blocks.IBlockVisitor;
 import com.javasegfault.shroomite.blocks.DirtBlock;
 import com.javasegfault.shroomite.blocks.LavaBlock;
 import com.javasegfault.shroomite.blocks.RockBlock;
@@ -8,7 +8,7 @@ import com.javasegfault.shroomite.blocks.SandBlock;
 import com.javasegfault.shroomite.blocks.WaterBlock;
 import com.javasegfault.shroomite.blocks.WoodBlock;
 
-public class PlayerBlockVisitor implements BlockVisitorInterface { 
+public class PlayerBlockVisitor implements IBlockVisitor { 
     public void visitRockBlock(RockBlock block) {
 
     }

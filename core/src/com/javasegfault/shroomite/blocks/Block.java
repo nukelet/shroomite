@@ -5,10 +5,10 @@ import com.javasegfault.shroomite.blocks.BlockType;
 import com.javasegfault.shroomite.World;
 import com.javasegfault.shroomite.util.Position;
 
-public abstract class Block implements BlockInterface {
+public abstract class Block implements IBlock {
     protected World world;
 	protected Position position;
-    protected BlockVisitorInterface visitor;
+    protected IBlockVisitor visitor;
 
     // whether the block can move
     public boolean movable = false;
@@ -46,7 +46,7 @@ public abstract class Block implements BlockInterface {
 
     }
 
-    public abstract void accept(BlockVisitorInterface visitor);
+    public abstract void accept(IBlockVisitor visitor);
 
     public void destroySelf() {
         world.removeBlock(this);

@@ -33,7 +33,7 @@ public class RockBlock extends Block {
     }
 
     @Override
-    public void accept(BlockVisitorInterface visitor) {
+    public void accept(IBlockVisitor visitor) {
         visitor.visitRockBlock(this);
     }
 }

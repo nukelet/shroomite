@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.javasegfault.shroomite.blocks.BlockType;
 import com.javasegfault.shroomite.util.Position;
 
-public interface BlockInterface {
+public interface IBlock {
     public Position getPosition();
 
 	public abstract BlockType getType();
@@ -17,5 +17,5 @@ public interface BlockInterface {
 
     public void move(Position pos);
 
-    public abstract void accept(BlockVisitorInterface visitor);
+    public abstract void accept(IBlockVisitor visitor);
 }

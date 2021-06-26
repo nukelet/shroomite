@@ -46,7 +46,7 @@ public class LavaBlock extends LiquidBlock {
     }
 
     @Override
-    public void accept(BlockVisitorInterface visitor) {
+    public void accept(IBlockVisitor visitor) {
         visitor.visitLavaBlock(this);
     }
 }

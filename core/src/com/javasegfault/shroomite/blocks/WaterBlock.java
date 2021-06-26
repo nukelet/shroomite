@@ -61,7 +61,7 @@ public class WaterBlock extends LiquidBlock {
     }
 
     @Override
-    public void accept(BlockVisitorInterface visitor) {
+    public void accept(IBlockVisitor visitor) {
         visitor.visitWaterBlock(this);
     }
 }

@@ -1,6 +1,6 @@
 package com.javasegfault.shroomite.blocks;
 
-public interface BlockVisitorInterface {
+public interface IBlockVisitor {
     public void visitRockBlock(RockBlock block);
     public void visitWaterBlock(WaterBlock block);
     public void visitDirtBlock(DirtBlock block);
