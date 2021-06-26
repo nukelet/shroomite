@@ -2,4 +2,13 @@
 - **Important**: fix fire textures for WoodBlock
 - Maybe adjust the rendering resolution to the screen size (having black bars and stuff) -- Viewports
 
-- Create an `update` method in the block interface that allows the Physics components to access the derived block interfaces without explicit typecasting?
+- Implement a simple inventory system
+    - Item: capable of interacting with blocks (e.g. create a BreakableBlock class that has some sort of "HP" and have the item decrease it gradually)
+
+- Give the player (maybe the Agent class) some attributes (hp/stamina/etc)
+- Add enemies?
+
+- Maybe have a level selection screen, create a few levels
+
+
+- Review and refactor the code
