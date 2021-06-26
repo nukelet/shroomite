@@ -3,7 +3,7 @@ package com.javasegfault.shroomite;
 import com.javasegfault.shroomite.blocks.Block;
 import com.javasegfault.shroomite.util.Position;
 
-public class World {
+public class World implements IWorld {
     private int width;
     private int height;
     private Block[][] blocks;
@@ -14,10 +14,12 @@ public class World {
         this.blocks = new Block[width][height];
     }
 
+    @Override
     public int getWidth() {
         return this.width;
     }
 
+    @Override
     public int getHeight() {
         return this.height;
     }
@@ -29,6 +31,7 @@ public class World {
      * @param block
      * @return True if position is valid, false otherwise.
      */
+    @Override
     public boolean setBlockAt(Position position, Block block) {
         if (!isValidPosition(position)) {
             return false;
@@ -38,6 +41,7 @@ public class World {
         return true;
     }
 
+    @Override
     public void addBlock(Block block) {
         Position pos = block.getPosition();
         if (!isValidPosition(pos)) {
@@ -61,6 +65,7 @@ public class World {
      * @return True if position is valid and there is no block at given position,
      *         false otherwise.
      */
+    @Override
     public boolean addBlockAt(Position position, Block block) {
         if (!isValidPosition(position)) {
             return false;
@@ -89,6 +94,7 @@ public class World {
      * @param position
      * @return Block at given position or null if position is not valid.
      */
+    @Override
     public Block getBlockAt(Position position) {
         if (!isValidPosition(position)) {
             return null;
@@ -97,6 +103,7 @@ public class World {
         return getBlockAtNoCheck(position);
     }
 
+    @Override
     public boolean hasBlockAt(Position position) {
         if (!isValidPosition(position)) {
             System.err.printf("Invalid position: %s\n", position);
@@ -122,6 +129,7 @@ public class World {
      * @param position
      * @return True if given position is valid, false otherwise.
      */
+    @Override
     public boolean removeBlockAt(Position position) {
         if (!isValidPosition(position)) {
             return false;
