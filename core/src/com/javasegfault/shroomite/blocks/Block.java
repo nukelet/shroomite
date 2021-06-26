@@ -1,7 +1,7 @@
 package com.javasegfault.shroomite.blocks;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.javasegfault.shroomite.BlockType;
+import com.javasegfault.shroomite.blocks.BlockType;
 import com.javasegfault.shroomite.World;
 import com.javasegfault.shroomite.util.Position;
 

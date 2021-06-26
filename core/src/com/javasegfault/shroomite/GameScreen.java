@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.javasegfault.shroomite.blocks.Block;
+import com.javasegfault.shroomite.blocks.BlockType;
 import com.javasegfault.shroomite.blocks.DirtBlock;
 import com.javasegfault.shroomite.blocks.LavaBlock;
 import com.javasegfault.shroomite.blocks.RockBlock;

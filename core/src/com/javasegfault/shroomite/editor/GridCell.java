@@ -1,6 +1,6 @@
 package com.javasegfault.shroomite.editor;
 
-import com.javasegfault.shroomite.BlockType;
+import com.javasegfault.shroomite.blocks.BlockType;
 import com.javasegfault.shroomite.TextureName;
 import com.javasegfault.shroomite.util.Position;
 

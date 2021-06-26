@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.javasegfault.shroomite.BlockType;
+import com.javasegfault.shroomite.blocks.BlockType;
 import com.javasegfault.shroomite.MainMenuScreen;
 import com.javasegfault.shroomite.Shroomite;
 import com.javasegfault.shroomite.util.Position;

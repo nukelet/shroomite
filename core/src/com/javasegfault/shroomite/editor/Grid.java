@@ -6,7 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import com.javasegfault.shroomite.BlockType;
+import com.javasegfault.shroomite.blocks.BlockType;
 import com.javasegfault.shroomite.TextureName;
 import com.javasegfault.shroomite.util.Position;
 
