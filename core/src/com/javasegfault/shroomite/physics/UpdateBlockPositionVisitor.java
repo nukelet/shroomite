@@ -54,65 +54,54 @@ public class UpdateBlockPositionVisitor implements IBlockVisitor {
             return;
         }
         
-        Position pos = block.getPosition();
-        Position posUp = pos.up();
-        Position posLeft = pos.left();
-        Position posRight = pos.right();
-        Position posDown = pos.down();
-
-        Block blockUp = world.getBlockAt(pos.up());
-        Block blockDown = world.getBlockAt(pos.down());
-        Block blockLeft = world.getBlockAt(pos.left());
-        Block blockRight = world.getBlockAt(pos.right());
-
         // TODO: there are still some typecasts...
-        if (blockDown == null) {
+
+        Position pos = block.getPosition();
+        Position posDown = pos.down();
+        if (!world.hasBlockAt(posDown)) {
             block.move(posDown);
             return;
-        } else if (blockDown.getType() == block.getType()) {
-            LiquidBlock thisBlock = block;
-            LiquidBlock thatBlock = (LiquidBlock) blockDown;
-            int thisMass = thisBlock.getMass();
-            int thatMass = thatBlock.getMass();
-            int thatMassFree = thatBlock.getMaxMass() - thatMass;
+        }
 
-            int flowMass;
-            if (thatMassFree >= thisMass) {
-                flowMass = thisMass;
-            } else {
-                flowMass = thatMassFree;
+        Block blockDown = world.getBlockAt(posDown);
+        if (blockDown.getType() == block.getType()) {
+            LiquidBlock otherLiquidBlock = (LiquidBlock) blockDown;
+            int otherLiquidBlockMassFree = otherLiquidBlock.getMaxMass() - otherLiquidBlock.getMass();
+            int flowMass = Math.min(otherLiquidBlockMassFree, block.getMass());
+            block.removeMass(flowMass); 
+            otherLiquidBlock.addMass(flowMass);
+        }
+
+        Position posLeft = pos.left();
+        if (!world.hasBlockAt(posLeft)) {
+            LiquidBlock newLiquidBlock = block.spawnNewBlock(posLeft);
+            // LiquidBlock newLiquidBlock = new LiquidBlock(posLeft, world);
+            newLiquidBlock.setMass(0);
+            block.exchangeMass(newLiquidBlock);
+            newLiquidBlocks.add(newLiquidBlock);
+            // world.addBlock(newLiquidBlock);
+        } else {
+            Block blockLeft = world.getBlockAt(posLeft);
+            if (blockLeft.getType() == block.getType()) {
+                LiquidBlock otherLiquidBlock = (LiquidBlock) blockLeft;
+                block.exchangeMass(otherLiquidBlock);
             }
-
-            thisBlock.removeMass(flowMass);
-            thatBlock.addMass(flowMass);
         }
 
-        if (blockLeft == null) {
-            LiquidBlock newBlock = block.spawnNewBlock(posLeft);
-            // LiquidBlock newBlock = new LiquidBlock(posLeft, world);
-            newBlock.setMass(0);
-            LiquidBlock thisBlock = block;
-            thisBlock.exchangeMass(newBlock);
-            newLiquidBlocks.add(newBlock);
-            // world.addBlock(newBlock);
-        } else if (blockLeft.getType() == block.getType()) {
-            LiquidBlock thisBlock = block;
-            LiquidBlock thatBlock = (LiquidBlock) blockLeft;
-            thisBlock.exchangeMass(thatBlock);
-        }
-
-        if (blockRight == null) {
-            LiquidBlock newBlock = block.spawnNewBlock(posRight);
-            // LiquidBlock newBlock = new LiquidBlock(posRight, world);
-            newBlock.setMass(0);
-            LiquidBlock thisBlock = block;
-            thisBlock.exchangeMass(newBlock);
-            newLiquidBlocks.add(newBlock);
-            // world.addBlock(newBlock);
-        } else if (blockRight.getType() == block.getType()) {
-            LiquidBlock thisBlock = block;
-            LiquidBlock thatBlock = (LiquidBlock) blockRight;
-            thisBlock.exchangeMass(thatBlock);
+        Position posRight = pos.right();
+        if (!world.hasBlockAt(posRight)) {
+            LiquidBlock newLiquidBlock = block.spawnNewBlock(posRight);
+            // LiquidBlock newLiquidBlock = new LiquidBlock(posRight, world);
+            newLiquidBlock.setMass(0);
+            block.exchangeMass(newLiquidBlock);
+            newLiquidBlocks.add(newLiquidBlock);
+            // world.addBlock(newLiquidBlock);
+        } else {
+            Block blockRight = world.getBlockAt(posRight);
+            if (blockRight.getType() == block.getType()) {
+                LiquidBlock otherLiquidBlock = (LiquidBlock) blockRight;
+                block.exchangeMass(otherLiquidBlock);
+            }
         }
     }
 
