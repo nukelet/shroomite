@@ -10,10 +10,6 @@ public abstract class Block implements BlockInterface {
 	protected Position position;
     protected BlockVisitorInterface visitor;
 
-    public boolean isUpdated;
-
-    // whether the block interacts with other blocks
-    public boolean inert = false;
     // whether the block can move
     public boolean movable = false;
     public boolean flammable = false;
@@ -49,6 +45,8 @@ public abstract class Block implements BlockInterface {
     public void render() {
 
     }
+
+    public abstract void accept(BlockVisitorInterface visitor);
 
     public void destroySelf() {
         world.removeBlock(this);

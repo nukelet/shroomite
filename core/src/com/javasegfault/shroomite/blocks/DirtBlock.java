@@ -32,6 +32,7 @@ public class DirtBlock extends Block {
 
     }
 
+    @Override
     public void accept(BlockVisitorInterface visitor) {
         visitor.visitDirtBlock(this);
     }

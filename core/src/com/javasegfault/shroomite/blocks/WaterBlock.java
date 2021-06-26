@@ -1,62 +1,28 @@
 package com.javasegfault.shroomite.blocks;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.javasegfault.shroomite.BlockType;
+import com.javasegfault.shroomite.blocks.BlockType;
 import com.javasegfault.shroomite.Shroomite;
 import com.javasegfault.shroomite.TextureName;
 import com.javasegfault.shroomite.World;
 import com.javasegfault.shroomite.util.Position;
 
-public class WaterBlock extends Block {
-    private int mass;
-    private final int maxMass = 100;
-    private float flowCoefficient = 0.8f;
-    public boolean pressurized = false;
-
+public class WaterBlock extends LiquidBlock {
 	public WaterBlock(Position position, World world) {
         super(position, world);
         this.movable = true;
         this.solid = false;
         this.liquid = true;
         
-        this.mass = maxMass;
+        this.maxMass = 100;
+        this.flowCoefficient = 0.9f;
+        this.mass = this.maxMass;
 	}
     
-    public void setMass(int mass) {
-        this.mass = mass;
-    }
-
-    public int getMass() {
-        return mass;
-    }
-
-    public void addMass(int mass) {
-        this.mass += mass;
-        if (this.mass > maxMass) {
-            pressurized = true;
-        } else if (this.mass <= 0) {
-            this.destroySelf();
-        }
-    }
-
-    public void removeMass(int mass) {
-        this.mass -= mass;
-        if (this.mass <= 0) {
-            destroySelf();
-        }
-    }
-
-    public void exchangeMass(WaterBlock block) {
-        if (block.getMass() < mass) {
-            int freeMass = block.getMaxMass() - block.getMass();
-            int flowMass = (int) ((mass - block.getMass()) * flowCoefficient);
-            block.addMass(flowMass);
-            this.removeMass(flowMass);
-        }
-    }
-
-    public int getMaxMass() {
-        return maxMass;
+    public WaterBlock spawnNewBlock(Position position) {
+        WaterBlock newBlock = new WaterBlock(position, world);
+        world.addBlock(newBlock);
+        return newBlock;
     }
 
 	@Override
@@ -80,15 +46,21 @@ public class WaterBlock extends Block {
 	
 	@Override
 	public String toString() {
-		return String.format("WaterBlock(position=%s, mass = %d, massRatio = %.2f)",
-                position.toString(), getMass(), (mass/(float) maxMass));
+		return String.format("WaterBlock(position=%s, mass = %d, maxMass = %d, massRatio = %.2f)",
+                position.toString(), getMass(), getMaxMass(), (mass/(float) maxMass));
 	}
 
     @Override
     public void interact(Block block) {
-
+        if (block.getType() == BlockType.LAVA) {
+            Position pos = block.getPosition();
+            block.destroySelf();
+            RockBlock rockBlock = new RockBlock(pos, world);
+            world.addBlock(rockBlock);
+        }
     }
 
+    @Override
     public void accept(BlockVisitorInterface visitor) {
         visitor.visitWaterBlock(this);
     }

@@ -28,6 +28,7 @@ import com.javasegfault.shroomite.blocks.WoodBlock;
 import com.javasegfault.shroomite.util.Position;
 import com.javasegfault.shroomite.Shroomite;
 import com.javasegfault.shroomite.agents.PlayerAgent;
+import com.javasegfault.shroomite.physics.Physics;
 
 public class GameScreen extends ScreenAdapter {
 	private final Shroomite game;

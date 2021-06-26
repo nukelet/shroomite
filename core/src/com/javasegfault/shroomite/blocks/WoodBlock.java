@@ -51,6 +51,7 @@ public class WoodBlock extends Block {
 
     }
 
+    @Override
     public void accept(BlockVisitorInterface visitor) {
         visitor.visitWoodBlock(this);
     }

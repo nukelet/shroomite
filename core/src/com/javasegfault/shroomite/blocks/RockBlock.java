@@ -32,6 +32,7 @@ public class RockBlock extends Block {
 
     }
 
+    @Override
     public void accept(BlockVisitorInterface visitor) {
         visitor.visitRockBlock(this);
     }
