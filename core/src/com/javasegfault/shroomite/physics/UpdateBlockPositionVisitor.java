@@ -25,7 +25,7 @@ public class UpdateBlockPositionVisitor implements IBlockVisitor {
     private void updateMovableBlock(Block block) {
         Position pos = block.getPosition();
         Position posDown = pos.down();
-        if (world.getBlockAt(posDown) == null) {
+        if (!world.hasBlockAt(posDown)) {
             block.move(posDown);
         }
     }
@@ -34,14 +34,14 @@ public class UpdateBlockPositionVisitor implements IBlockVisitor {
         Position pos = block.getPosition();
         Position posDown = pos.down();
         Position posDownLeft = posDown.left();
-        Position posDownRight = posDown.right();
-        if (world.getBlockAt(posDown) == null) {
+        Position posDownRight = posDown.right();  
+        if (!world.hasBlockAt(posDown)) {
             block.move(posDown);
-        } else if (world.getBlockAt(posDownLeft) == null) {
+        } else if (!world.hasBlockAt(posDownLeft)) {
             block.move(posDownLeft);
-        } else if (world.getBlockAt(posDownRight) == null) {
+        } else if (!world.hasBlockAt(posDownRight)) {
             block.move(posDownRight);
-        }        
+        }
     }
 
     private void updateLiquidBlock(LiquidBlock block) {
