@@ -57,6 +57,10 @@ public abstract class LiquidBlock extends Block {
         return maxMass;
     }
 
+    public int getMassFree() {
+        return maxMass - mass;
+    }
+
     public abstract LiquidBlock spawnNewBlock(Position position);
 
 	@Override

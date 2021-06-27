@@ -73,9 +73,8 @@ public class UpdateBlockPositionVisitor implements IBlockVisitor {
         Block blockDown = world.getBlockAt(posDown);
         if (blockDown.getType() == block.getType()) {
             LiquidBlock otherLiquidBlock = (LiquidBlock) blockDown;
-            int otherLiquidBlockMassFree = otherLiquidBlock.getMaxMass() - otherLiquidBlock.getMass();
-            int flowMass = Math.min(otherLiquidBlockMassFree, block.getMass());
-            block.removeMass(flowMass); 
+            int flowMass = Math.min(otherLiquidBlock.getMassFree(), block.getMass());
+            block.removeMass(flowMass);
             otherLiquidBlock.addMass(flowMass);
         }
 
