@@ -1,14 +1,13 @@
 package com.javasegfault.shroomite.blocks;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.javasegfault.shroomite.blocks.BlockType;
+import com.javasegfault.shroomite.IWorld;
 import com.javasegfault.shroomite.Shroomite;
 import com.javasegfault.shroomite.TextureName;
-import com.javasegfault.shroomite.World;
 import com.javasegfault.shroomite.util.Position;
 
 public class LavaBlock extends LiquidBlock {
-	public LavaBlock(Position position, World world) {
+	public LavaBlock(Position position, IWorld world) {
         super(position, world);
         this.solid = false;
         this.liquid = true;
@@ -28,16 +27,16 @@ public class LavaBlock extends LiquidBlock {
 	public BlockType getType() {
 		return BlockType.LAVA;
 	}
-	
+
 	@Override
 	public Texture getTexture() {
 		return Shroomite.textures.get(TextureName.LAVA);
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("LavaBlock(position=%s, mass = %d, maxMass = %d, massRatio = %.2f)",
-                position.toString(), getMass(), getMaxMass(), (mass/(float) maxMass));
+                position.toString(), getMass(), getMaxMass(), getMassRatio());
 	}
 
     @Override

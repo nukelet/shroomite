@@ -1,24 +1,23 @@
 package com.javasegfault.shroomite.blocks;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.javasegfault.shroomite.blocks.BlockType;
+import com.javasegfault.shroomite.IWorld;
 import com.javasegfault.shroomite.Shroomite;
 import com.javasegfault.shroomite.TextureName;
-import com.javasegfault.shroomite.World;
 import com.javasegfault.shroomite.util.Position;
 
 public class WaterBlock extends LiquidBlock {
-	public WaterBlock(Position position, World world) {
+	public WaterBlock(Position position, IWorld world) {
         super(position, world);
         this.movable = true;
         this.solid = false;
         this.liquid = true;
-        
+
         this.maxMass = 100;
         this.flowCoefficient = 0.9f;
         this.mass = this.maxMass;
 	}
-    
+
     public WaterBlock spawnNewBlock(Position position) {
         WaterBlock newBlock = new WaterBlock(position, world);
         world.addBlock(newBlock);
@@ -29,10 +28,10 @@ public class WaterBlock extends LiquidBlock {
 	public BlockType getType() {
 		return BlockType.WATER;
 	}
-	
+
 	@Override
 	public Texture getTexture() {
-        float massRatio = (mass/ (float) maxMass);
+        float massRatio = getMassRatio();
         if (massRatio > 1.0f) {
             return Shroomite.textures.get(TextureName.WATER_CRITICAL);
         } else if (massRatio > 0.75f) {
@@ -43,11 +42,11 @@ public class WaterBlock extends LiquidBlock {
             return Shroomite.textures.get(TextureName.WATER_ONE_QUARTER);
         }
 	}
-	
+
 	@Override
 	public String toString() {
 		return String.format("WaterBlock(position=%s, mass = %d, maxMass = %d, massRatio = %.2f)",
-                position.toString(), getMass(), getMaxMass(), (mass/(float) maxMass));
+                position.toString(), getMass(), getMaxMass(), getMassRatio());
 	}
 
     @Override

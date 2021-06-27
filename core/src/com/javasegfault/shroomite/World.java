@@ -44,7 +44,7 @@ public class World implements IWorld {
         }
 
         setBlockAtNoCheck(position, block);
-        block.move(position);
+        block.setPosition(position);
         return true;
     }
 
@@ -78,7 +78,7 @@ public class World implements IWorld {
         }
 
         setBlockAtNoCheck(position, block);
-        block.move(position);
+        block.setPosition(position);
         return true;
     }
 
@@ -99,7 +99,7 @@ public class World implements IWorld {
     @Override
     public boolean hasBlockAt(Position position) {
         if (!isValidPosition(position)) {
-            System.err.printf("Invalid position: %s\n", position);
+//            System.err.printf("Invalid position: %s\n", position);
             return false;
         }
 
@@ -118,6 +118,23 @@ public class World implements IWorld {
         }
 
         removeBlockAtNoCheck(position);
+        return true;
+    }
+
+    @Override
+    public boolean moveBlock(Block block, Position newPosition) {
+        if (!isValidPosition(newPosition)) {
+            return false;
+        }
+
+        Position currentPosition = block.getPosition();
+        if (isValidPosition(currentPosition)) {
+            removeBlockAtNoCheck(currentPosition);
+        }
+
+        setBlockAtNoCheck(newPosition, block);
+        block.setPosition(newPosition);
+
         return true;
     }
 

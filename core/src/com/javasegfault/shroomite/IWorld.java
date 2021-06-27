@@ -67,4 +67,14 @@ public interface IWorld {
      * @return True if position is valid, false otherwise.
      */
     boolean removeBlockAt(Position position);
+
+    /**
+     * Moves block to newPosition, updating the block in world and
+     * setting block position to newPosition, if newPosition is valid.
+     *
+     * @param block
+     * @param newPosition
+     * @return True if newPosition is valid, false otherwise.
+     */
+    boolean moveBlock(Block block, Position newPosition);
 }

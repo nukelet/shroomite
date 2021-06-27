@@ -1,7 +1,6 @@
 package com.javasegfault.shroomite.blocks;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.javasegfault.shroomite.World;
+import com.javasegfault.shroomite.IWorld;
 import com.javasegfault.shroomite.util.Position;
 
 public abstract class LiquidBlock extends Block {
@@ -10,7 +9,7 @@ public abstract class LiquidBlock extends Block {
     protected float flowCoefficient;
     public boolean pressurized = false;
 
-	public LiquidBlock(Position position, World world) {
+	public LiquidBlock(Position position, IWorld world) {
         super(position, world);
         this.movable = true;
         this.solid = false;
@@ -20,7 +19,7 @@ public abstract class LiquidBlock extends Block {
         this.flowCoefficient = 0.9f;
         this.mass = this.maxMass;
 	}
-    
+
     public void setMass(int mass) {
         this.mass = mass;
     }
@@ -61,17 +60,9 @@ public abstract class LiquidBlock extends Block {
         return maxMass - mass;
     }
 
+    public float getMassRatio() {
+        return (float)mass / maxMass;
+    }
+
     public abstract LiquidBlock spawnNewBlock(Position position);
-
-	@Override
-	public abstract BlockType getType();
-	
-	@Override
-	public abstract Texture getTexture();
-	
-	@Override
-	public abstract String toString();
-
-    @Override
-    public abstract void interact(Block block);
 }
