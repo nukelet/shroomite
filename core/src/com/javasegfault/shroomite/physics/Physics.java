@@ -64,14 +64,14 @@ public class Physics {
         newLiquidBlocks.clear();
         for (int x = 0; x < world.getWidth(); x++) {
             for  (int y = 0; y < world.getHeight(); y++) {
-                Block block = world.getBlockAt(x, y);
-
-                if (block == null) {
+                Position pos = new Position(x, y);
+                if (!world.hasBlockAt(pos)) {
                     continue;
-                } else {
-                    // System.out.println(block);
                 }
-                
+
+                Block block = world.getBlockAt(pos);
+                // System.out.println(block);
+
                 // TODO: i suppose this could be broken down into functions
                 // really gotta come up with a way to organize this in a way
                 // that makes it scalable i guess
