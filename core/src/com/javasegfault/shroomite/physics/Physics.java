@@ -104,21 +104,19 @@ public class Physics {
     }
 
     public void updateCollidingBlocks(Agent agent) {
-        Vector2 pos = agent.getPosition();
-
         collidingBlocks.clear();
 
-        // bottom left corner coordinates
-        int gridPosX0 = (int) (pos.x/(float) Shroomite.BLOCK_WIDTH);
-        int gridPosY0 = (int) (pos.y/(float) Shroomite.BLOCK_HEIGHT);
-        // top right corner coordinates
-        int gridPosX1 = (int) ((pos.x + agent.getWidth())/(float) Shroomite.BLOCK_WIDTH);
-        int gridPosY1 = (int) ((pos.y + agent.getHeight())/(float) Shroomite.BLOCK_HEIGHT);
+        Vector2 agentPosition = agent.getPosition();
+        int agentBottomLeftGridPositionX = (int) (agentPosition.x / Shroomite.BLOCK_WIDTH);
+        int agentBottomLeftGridPositionY = (int) (agentPosition.y / Shroomite.BLOCK_HEIGHT);
+        int agentTopRightGridPositionX = (int) ((agentPosition.x + agent.getWidth()) / Shroomite.BLOCK_WIDTH);
+        int agentTopRightGridPositionY = (int) ((agentPosition.y + agent.getHeight()) / Shroomite.BLOCK_HEIGHT);
 
-        for (int x = gridPosX0; x <= gridPosX1; x++) {
-            for (int y = gridPosY0; y <= gridPosY1; y++) {
-                Block block = world.getBlockAt(x, y);
-                if (block != null) {
+        for (int x = agentBottomLeftGridPositionX; x <= agentTopRightGridPositionX; x++) {
+            for (int y = agentBottomLeftGridPositionY; y <= agentTopRightGridPositionY; y++) {
+                Position pos = new Position(x, y);
+                if (world.hasBlockAt(pos)) {
+                    Block block = world.getBlockAt(pos);
                     collidingBlocks.add(block);
                 }
             }
