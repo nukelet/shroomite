@@ -33,14 +33,21 @@ public class UpdateBlockPositionVisitor implements IBlockVisitor {
     private void updateSandBlock(SandBlock block) {
         Position pos = block.getPosition();
         Position posDown = pos.down();
-        Position posDownLeft = posDown.left();
-        Position posDownRight = posDown.right();  
         if (!world.hasBlockAt(posDown)) {
             block.move(posDown);
-        } else if (!world.hasBlockAt(posDownLeft)) {
+            return;
+        }
+
+        Position posDownLeft = posDown.left();
+        if (!world.hasBlockAt(posDownLeft)) {
             block.move(posDownLeft);
-        } else if (!world.hasBlockAt(posDownRight)) {
+            return;
+        }
+
+        Position posDownRight = posDown.right();
+        if (!world.hasBlockAt(posDownRight)) {
             block.move(posDownRight);
+            return;
         }
     }
 
