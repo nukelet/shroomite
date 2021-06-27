@@ -34,18 +34,28 @@ public class Physics {
     public void updateInteractions() {
         for (int x = 0; x < world.getWidth(); x++) {
             for (int y = 0; y < world.getHeight(); y++) {
-                Block block = world.getBlockAt(x, y);
-
-                if (block == null) {
+                Position pos = new Position(x, y);
+                if (!world.hasBlockAt(pos)) {
                     continue;
                 }
 
-                Position pos = block.getPosition();
-
-                block.interactBlock(world.getBlockAt(pos.up()));
-                block.interactBlock(world.getBlockAt(pos.down()));
-                block.interactBlock(world.getBlockAt(pos.left()));
-                block.interactBlock(world.getBlockAt(pos.right()));
+                Block block = world.getBlockAt(pos);
+                Position posUp = pos.up();
+                if (world.hasBlockAt(posUp)) {
+                    block.interact(world.getBlockAt(posUp));
+                }
+                Position posDown = pos.down();
+                if (world.hasBlockAt(posDown)) {
+                    block.interact(world.getBlockAt(posDown));
+                }
+                Position posLeft = pos.left();
+                if (world.hasBlockAt(posLeft)) {
+                    block.interact(world.getBlockAt(posLeft));
+                }
+                Position posRight = pos.right();
+                if (world.hasBlockAt(posRight)) {
+                    block.interact(world.getBlockAt(posRight));
+                }
             }
         }
     }
