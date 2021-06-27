@@ -9,39 +9,62 @@ public interface IWorld {
     int getHeight();
 
     /**
-     * Adds block to world at the given position.
-     * 
+     * Adds block to world at the current block position.
+     *
+     * @param block
+     * @return True if position is valid, false otherwise.
+     */
+    boolean setBlock(Block block);
+
+    /**
+     * Adds block to world at position and sets block position to
+     * position.
+     *
      * @param position
      * @param block
      * @return True if position is valid, false otherwise.
      */
     boolean setBlockAt(Position position, Block block);
 
-    void addBlock(Block block);
+    /**
+     * Adds block to world at the current block position if world has
+     * no block at position.
+     *
+     * @param block
+     * @return True if position is valid and world has no block at
+     * position, false otherwise.
+     */
+    boolean addBlock(Block block);
 
     /**
-     * Adds block to world at the given position if the position is empty.
-     * 
+     * Adds block to world at position and sets block position to
+     * position if world has no blocks at position.
+     *
      * @param position
      * @param block
-     * @return True if position is valid and there is no block at given position,
-     *         false otherwise.
+     * @return True if position is valid and world has no block at
+     * position, false otherwise.
      */
     boolean addBlockAt(Position position, Block block);
 
     /**
      * @param position
-     * @return Block at given position or null if position is not valid.
+     * @return Block at position or null if position is not valid.
      */
     Block getBlockAt(Position position);
 
+    /**
+     * @param position
+     * @return False if position is not valid or there is no block at
+     * position, false otherwise.
+     */
     boolean hasBlockAt(Position position);
 
     /**
      * Removes block from world at the given position.
-     * 
+     *
      * @param position
-     * @return True if given position is valid, false otherwise.
+     * @return True if position is valid, false otherwise.
      */
     boolean removeBlockAt(Position position);
 }
