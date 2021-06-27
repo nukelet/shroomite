@@ -8,6 +8,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -50,6 +51,12 @@ public class GameScreen extends ScreenAdapter {
     private Physics physics = new Physics(world);
     private PlayerAgent player = new PlayerAgent(world, new Vector2(3.0f * BLOCK_WIDTH, 20.0f * BLOCK_HEIGHT));
 
+    private float framesPerSecond;
+    private Position bottomLeftMousePosition;
+    private Position mouseGridPosition;
+    private Block blockPointedAt;
+    private Position playerGridPosition;
+
     public GameScreen(final Shroomite game) {
 		this.game = game;
 		
@@ -64,45 +71,66 @@ public class GameScreen extends ScreenAdapter {
 		lastClickedBlock = null;
 
         physics = new Physics(world);
+
+        bottomLeftMousePosition = new Position(-1, -1);
+        mouseGridPosition = new Position(-1, -1);
+        playerGridPosition = new Position(-1, -1);
 	}
-	
-        @Override
-	public void render(float delta) {
-		ScreenUtils.clear(0, 0, 0.2f, 1);
-		camera.update();
-		game.batch.setProjectionMatrix(camera.combined);
-        shapeRenderer.setProjectionMatrix(camera.combined);
-		handleInput();
+
+    @Override
+    public void render(float delta) {
+        framesPerSecond = 1 / Gdx.graphics.getDeltaTime();
+        bottomLeftMousePosition.set(Gdx.input.getX(),
+                Gdx.graphics.getHeight() - Gdx.input.getY() - 1);
+        mouseGridPosition.set(bottomLeftMousePosition.getX() / BLOCK_WIDTH,
+                bottomLeftMousePosition.getY() / BLOCK_HEIGHT);
+        blockPointedAt = world.getBlockAt(mouseGridPosition);
+        playerGridPosition.set((int) (player.getPosition().x / BLOCK_WIDTH),
+                (int) (player.getPosition().y / BLOCK_HEIGHT));
+
+        camera.update();
+
+        handleInput();
+
         physics.updatePlayer(player, delta);
 
-        game.batch.begin();
-		renderWorld();
-        float fps = 1/Gdx.graphics.getDeltaTime();
-        font.draw(game.batch, String.format("%.2f", fps), 50, 500);
+        ScreenUtils.clear(0, 0, 0.2f, 1);
 
-        font.draw(game.batch,String.format("velocity: (%.2f, %.2f)",
-                    player.getSpeed().x, player.getSpeed().y), 300, 500);
-        
+        game.batch.setProjectionMatrix(camera.combined);
+        shapeRenderer.setProjectionMatrix(camera.combined);
+
+        game.batch.begin();
+        renderWorld();
+        drawCollidingBlocks();
+        game.batch.end();
+
+        shapeRenderer.begin(ShapeType.Line);
+        drawGridLines();
+        drawPlayerHitbox();
+        shapeRenderer.end();
+
+        game.batch.begin();
+        drawPlayer();
+        game.batch.end();
+
+        shapeRenderer.begin(ShapeType.Filled);
+        drawDebugInfoBackground();
+        shapeRenderer.end();
+
+        game.batch.begin();
+        drawDebugInfo();
+        game.batch.end();
+    }
+
+    private void drawCollidingBlocks() {
         Array<Block> collidingBlocks = physics.getCollidingBlocks(player);
         for (Block block : collidingBlocks) {
             game.drawBlockRegion(Shroomite.textures.get(TextureName.WATER_CRITICAL),
                     block.getPosition().getX(), block.getPosition().getY());
         }
+    }
 
-        // bottom left corner coordinates
-        Vector2 pos = player.getPosition();
-        int gridPosX0 = (int) (pos.x/(float) BLOCK_WIDTH);
-        int gridPosY0 = (int) (pos.y/(float) BLOCK_HEIGHT);
-        font.draw(game.batch,String.format("grid position: (%d, %d)", gridPosX0, gridPosY0), 600, 500);
-
-        float playerX = player.getPosition().x;
-        float playerY = player.getPosition().y;
-        game.batch.draw(player.getTexture(), playerX, playerY,
-                player.getTextureWidth(), player.getTextureHeight());
-
-		game.batch.end();
-
-        shapeRenderer.begin(ShapeType.Line);
+    private void drawGridLines() {
         shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1.0f);
 
         for (int x = 0; x < GRID_WIDTH * BLOCK_WIDTH; x++) {
@@ -112,12 +140,52 @@ public class GameScreen extends ScreenAdapter {
         for (int y = 0; y < GRID_HEIGHT * BLOCK_HEIGHT; y++) {
             shapeRenderer.line(0, BLOCK_HEIGHT*y, 800, BLOCK_HEIGHT*y);
         }
+    }
 
+    private void drawPlayerHitbox() {
         shapeRenderer.setColor(1f, 1f, 1f, 1f);
-        shapeRenderer.rect(pos.x, pos.y, player.getWidth(), player.getHeight());
-        shapeRenderer.end();
-	}
-	
+        shapeRenderer.rect(player.getPosition().x, player.getPosition().y, player.getWidth(), player.getHeight());
+    }
+
+    private void drawPlayer() {
+        game.batch.draw(player.getTexture(), player.getPosition().x, player.getPosition().y,
+                player.getTextureWidth(), player.getTextureHeight());
+    }
+
+    private void drawDebugInfoBackground() {
+        shapeRenderer.setColor(Color.BLACK);
+        shapeRenderer.rect(538, 300, 252, 238);
+    }
+
+    private void drawDebugInfo() {
+        font.draw(game.batch, String.format("%.0f FPS", framesPerSecond), 550, 520);
+
+        font.draw(game.batch, String.format("Player position: (%.0f, %.0f)",
+                player.getPosition().x, player.getPosition().y), 550, 500);
+
+        font.draw(game.batch, String.format("Player grid position: (%d, %d)",
+                playerGridPosition.getX(), playerGridPosition.getY()), 550, 480);
+
+        font.draw(game.batch, String.format("Player speed: (%.0f, %.0f)",
+                player.getSpeed().x, player.getSpeed().y), 550, 460);
+
+        font.draw(game.batch, String.format("TL mouse position: (%d, %d)",
+                Gdx.input.getX(), Gdx.input.getY()), 550, 440);
+
+        font.draw(game.batch, String.format("BL mouse position: (%d, %d)",
+                bottomLeftMousePosition.getX(), bottomLeftMousePosition.getY()), 550, 420);
+
+        font.draw(game.batch, String.format("Mouse grid position: (%d, %d)",
+                mouseGridPosition.getX(), mouseGridPosition.getY()), 550, 400);
+
+        if (blockPointedAt != null) {
+            font.draw(game.batch, String.format("Block pointed at: %s",
+                    blockPointedAt.getType()), 550, 380);
+        } else {
+            font.draw(game.batch, "Block pointed at: NONE", 550, 380);
+        }
+    }
+
 	@Override
 	public void resize(int width, int height) {
 		
@@ -175,7 +243,7 @@ public class GameScreen extends ScreenAdapter {
             Vector3 mousePos = new Vector3(0, 0, 0);
             mousePos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(mousePos);
-            System.out.println("x = " + mousePos.x + ", y = " + mousePos.y);
+//            System.out.println("x = " + mousePos.x + ", y = " + mousePos.y);
             int mouseWorldPosX = (int) (mousePos.x / BLOCK_WIDTH);
             int mouseWorldPosY = (int) (mousePos.y / BLOCK_HEIGHT);
             if (currentTime - lastMousePressTime > 500) {
