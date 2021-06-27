@@ -1,7 +1,7 @@
 package com.javasegfault.shroomite.physics;
 
 import com.badlogic.gdx.utils.ObjectSet;
-import com.javasegfault.shroomite.World;
+import com.javasegfault.shroomite.IWorld;
 import com.javasegfault.shroomite.blocks.Block;
 import com.javasegfault.shroomite.blocks.IBlockVisitor;
 import com.javasegfault.shroomite.blocks.DirtBlock;
@@ -13,8 +13,8 @@ import com.javasegfault.shroomite.blocks.WaterBlock;
 import com.javasegfault.shroomite.blocks.WoodBlock;
 import com.javasegfault.shroomite.util.Position;
 
-public class UpdateBlockPositionVisitor implements IBlockVisitor { 
-    private World world;
+public class UpdateBlockPositionVisitor implements IBlockVisitor {
+    private IWorld world;
     private ObjectSet<LiquidBlock> newLiquidBlocks;
 
     public UpdateBlockPositionVisitor(Physics physics) {

@@ -1,21 +1,19 @@
 package com.javasegfault.shroomite.physics;
 
-import com.javasegfault.shroomite.agents.Agent;
-import com.javasegfault.shroomite.agents.PlayerAgent;
-import com.javasegfault.shroomite.blocks.Block;
-import com.javasegfault.shroomite.blocks.WaterBlock;
-import com.javasegfault.shroomite.util.Position;
-import com.javasegfault.shroomite.World;
-import com.javasegfault.shroomite.blocks.BlockType;
-import com.javasegfault.shroomite.blocks.IBlockVisitor;
-import com.javasegfault.shroomite.blocks.LiquidBlock;
-import com.javasegfault.shroomite.Shroomite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.javasegfault.shroomite.IWorld;
+import com.javasegfault.shroomite.Shroomite;
+import com.javasegfault.shroomite.agents.Agent;
+import com.javasegfault.shroomite.agents.PlayerAgent;
+import com.javasegfault.shroomite.blocks.Block;
+import com.javasegfault.shroomite.blocks.IBlockVisitor;
+import com.javasegfault.shroomite.blocks.LiquidBlock;
+import com.javasegfault.shroomite.util.Position;
 
 public class Physics {
-    public World world;
+    public IWorld world;
 
     public ObjectSet<LiquidBlock> newLiquidBlocks;
     Array<Block> collidingBlocks;
@@ -24,7 +22,7 @@ public class Physics {
 
     public float gravity = -1000f;
 
-    public Physics(World world) {
+    public Physics(IWorld world) {
         this.world = world;
         this.newLiquidBlocks = new ObjectSet<LiquidBlock>();
         this.updateBlockPositionVisitor = new UpdateBlockPositionVisitor(this);

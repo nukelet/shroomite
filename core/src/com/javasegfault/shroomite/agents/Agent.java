@@ -3,16 +3,16 @@ package com.javasegfault.shroomite.agents;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.javasegfault.shroomite.IWorld;
 import com.javasegfault.shroomite.Shroomite;
 import com.javasegfault.shroomite.TextureName;
-import com.javasegfault.shroomite.World;
 import com.javasegfault.shroomite.blocks.Block;
 import com.javasegfault.shroomite.blocks.IBlockVisitor;
 
 public abstract class Agent implements IAgent {
     // position measured from bottom left corner
     Vector2 position;
-    World world;
+    IWorld world;
     IBlockVisitor agentBlockVisitor;
     // separate the hitbox rectangle from the texture rectangle
     Rectangle hitbox;
@@ -38,7 +38,7 @@ public abstract class Agent implements IAgent {
     }
 
     // TODO: hard-coded
-    public Agent(World world, Vector2 position) {
+    public Agent(IWorld world, Vector2 position) {
         this.world = world;
         this.position = position;
         this.HITBOX_WIDTH = 70;

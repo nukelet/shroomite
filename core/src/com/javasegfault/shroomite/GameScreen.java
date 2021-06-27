@@ -1,9 +1,5 @@
 package com.javasegfault.shroomite;
 
-import java.io.File;
-import java.util.List;
-import java.util.Random;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
@@ -14,40 +10,30 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.javasegfault.shroomite.agents.PlayerAgent;
 import com.javasegfault.shroomite.blocks.Block;
-import com.javasegfault.shroomite.blocks.BlockType;
-import com.javasegfault.shroomite.blocks.DirtBlock;
 import com.javasegfault.shroomite.blocks.LavaBlock;
 import com.javasegfault.shroomite.blocks.RockBlock;
-import com.javasegfault.shroomite.blocks.SandBlock;
-import com.javasegfault.shroomite.blocks.WaterBlock;
-import com.javasegfault.shroomite.blocks.WoodBlock;
-import com.javasegfault.shroomite.util.Position;
-import com.javasegfault.shroomite.Shroomite;
-import com.javasegfault.shroomite.agents.PlayerAgent;
 import com.javasegfault.shroomite.physics.Physics;
+import com.javasegfault.shroomite.util.Position;
 
 public class GameScreen extends ScreenAdapter {
 	private final Shroomite game;
 	private OrthographicCamera camera;
     private ShapeRenderer shapeRenderer = new ShapeRenderer();
     private BitmapFont font = new BitmapFont();
-	
+
 	private int BLOCK_WIDTH = Shroomite.BLOCK_WIDTH;
 	private int BLOCK_HEIGHT = Shroomite.BLOCK_HEIGHT;
 	private int GRID_WIDTH = Shroomite.GRID_WIDTH;
 	private int GRID_HEIGHT = Shroomite.GRID_HEIGHT;
-	
-	private Block blocks[][] = new Block[GRID_HEIGHT][GRID_WIDTH];
-	private Block lastClickedBlock;
 
-    private World world = new World(GRID_WIDTH, GRID_HEIGHT);
+    private IWorld world = new World(GRID_WIDTH, GRID_HEIGHT);
     private Physics physics = new Physics(world);
     private PlayerAgent player = new PlayerAgent(world, new Vector2(3.0f * BLOCK_WIDTH, 20.0f * BLOCK_HEIGHT));
 
@@ -59,16 +45,15 @@ public class GameScreen extends ScreenAdapter {
 
     public GameScreen(final Shroomite game) {
 		this.game = game;
-		
+
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 600);
-		
+
 		// generateWorld();
 
         // for some reason the "./" path is defaulted to the assets folder
         String fileName = "test.grid";
         world = WorldGenerator.generateWorld("worlds/" + fileName);
-		lastClickedBlock = null;
 
         physics = new Physics(world);
 
@@ -248,7 +233,8 @@ public class GameScreen extends ScreenAdapter {
             int mouseWorldPosY = (int) (mousePos.y / BLOCK_HEIGHT);
             if (currentTime - lastMousePressTime > 500) {
                 System.out.println("world coordinates: x = " + mouseWorldPosX + ", y = " + mouseWorldPosY);
-                Block block = world.getBlockAt(mouseWorldPosX, mouseWorldPosY);
+                Position mouseWorldPosition = new Position(mouseWorldPosX, mouseWorldPosY);
+                Block block = world.getBlockAt(mouseWorldPosition);
                 System.out.println(block);
                 lastMousePressTime = currentTime;
                 // if (block != null && block.getType() == BlockType.WATER) {
@@ -308,11 +294,10 @@ public class GameScreen extends ScreenAdapter {
 	private void renderWorld() {
 		for (int i = 0; i < GRID_WIDTH; i++) {
 			for (int j = 0; j < GRID_HEIGHT; j++) {
-				Block block = world.getBlockAt(i, j);
-				if (block != null) {
-					Texture texture = block.getTexture();
-                    Position pos = block.getPosition();
-                    game.drawBlockRegion(texture, pos.getX(), pos.getY());
+			    Position position = new Position(i, j);
+			    if (world.hasBlockAt(position)) {
+			        Block block = world.getBlockAt(position);
+                    game.drawBlockRegion(block.getTexture(), position.getX(), position.getY());
 				} else {
 					// desenha a textura padrão para a altura correspondente
 					// Texture texture = null;
