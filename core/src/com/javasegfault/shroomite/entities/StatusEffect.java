@@ -8,7 +8,7 @@ public enum StatusEffect {
     private final int damage;
     private long startTick;
     private long lastTick;
-    
+
     // all in milliseconds
     StatusEffect(long tickDuration, long duration, int damage) {
         this.startTick = 0;
@@ -44,5 +44,9 @@ public enum StatusEffect {
 
     public int getDamage() {
         return damage;
+    }
+
+    public long getRemainingTime() {
+        return duration - (lastTick - startTick);
     }
 }
