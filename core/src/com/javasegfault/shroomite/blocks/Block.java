@@ -8,12 +8,7 @@ public abstract class Block implements IBlock {
 	protected Position position;
     protected IBlockVisitor visitor;
 
-    // whether the block can move
     public boolean movable = false;
-    public boolean flammable = false;
-    // whether the block is part of a rigid body (in case we want
-    // to do stuff with Box2D later)
-    public boolean rigid = false;
     public boolean solid = true;
     public boolean liquid = false;
 

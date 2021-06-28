@@ -26,8 +26,7 @@ import com.javasegfault.shroomite.entities.PlayerAgent;
 import com.javasegfault.shroomite.entities.StatusEffect;
 import com.javasegfault.shroomite.entities.UnlockableEntity;
 import com.javasegfault.shroomite.blocks.Block;
-import com.javasegfault.shroomite.blocks.LavaBlock;
-import com.javasegfault.shroomite.blocks.RockBlock;
+import com.javasegfault.shroomite.blocks.LiquidBlock;
 import com.javasegfault.shroomite.physics.Physics;
 import com.javasegfault.shroomite.util.Position;
 
@@ -126,6 +125,7 @@ public class GameScreen extends ScreenAdapter {
         shapeRenderer.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
+        renderBackground();
         renderWorld();
         drawCollidingBlocks();
 
@@ -262,39 +262,6 @@ public class GameScreen extends ScreenAdapter {
 	public void drawBlockRegion(Texture texture, int gridPosX, int gridPosY) {
 		game.batch.draw(texture, gridPosX*BLOCK_WIDTH, gridPosY*BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT);
 	}
-
-    private void generateWorld() {
-        for (int x = 0; x < GRID_WIDTH; x++) {
-            Position lowerHorizontal = new Position(x, 0);
-            Position upperHorizontal = new Position(x, GRID_HEIGHT-1);
-            world.addBlock(new RockBlock(lowerHorizontal, world));
-            world.addBlock(new RockBlock(upperHorizontal, world));
-        }
-
-        for (int y = 0; y < GRID_HEIGHT; y++) {
-            Position leftVertical = new Position(0, y);
-            Position rightVertical = new Position(GRID_WIDTH-1, y);
-            world.addBlock(new RockBlock(leftVertical, world));
-            world.addBlock(new RockBlock(rightVertical, world));
-        }
-
-        for (int x = GRID_WIDTH / 2 - 10; x < GRID_WIDTH / 2 + 10; x++) {
-            for (int y = GRID_HEIGHT - 10; y < GRID_HEIGHT - 1; y++) {
-                Position pos = new Position(x, y);
-                world.addBlock(new LavaBlock(pos, world));
-            }
-        }
-
-        for (int x = 0; x < GRID_WIDTH; x++) {
-            Position pos = new Position(x, 1);
-            world.addBlock(new LavaBlock(pos, world));
-        }
-
-        for (int x = 0; x < 11; x++) {
-            Position pos = new Position(x+4, x+14);
-            world.addBlock(new RockBlock(pos, world));
-        }
-    }
 	
     private long lastPhysicsCallTime = 0;
     private long lastMousePressTime = 0;
@@ -374,6 +341,22 @@ public class GameScreen extends ScreenAdapter {
         }
 	}
 
+    private void renderBackground() {
+		for (int x = 0; x < GRID_WIDTH; x++) {
+			for (int y = 0; y < GRID_HEIGHT; y++) {
+                int idx = x*GRID_WIDTH + y;
+                Texture texture = null;
+                if (idx % 3 == 0) {
+                    texture = Shroomite.textures.get(TextureName.WALL_LEFT);
+                } else if (idx % 3 == 1) {
+                    texture = Shroomite.textures.get(TextureName.WALL_MID);
+                } else {
+                    texture = Shroomite.textures.get(TextureName.WALL_RIGHT);
+                }
+                game.drawBlockRegion(texture, x, y);
+			}
+		}
+    }
 	private void renderWorld() {
 		for (int i = 0; i < GRID_WIDTH; i++) {
 			for (int j = 0; j < GRID_HEIGHT; j++) {
@@ -381,20 +364,7 @@ public class GameScreen extends ScreenAdapter {
 			    if (world.hasBlockAt(position)) {
 			        Block block = world.getBlockAt(position);
                     game.drawBlockRegion(block.getTexture(), position.getX(), position.getY());
-				} else {
-					// desenha a textura padrão para a altura correspondente
-					// Texture texture = null;
-					// if (j == 15 || j == 14) {
-					// 	texture = Shroomite.textures.get(TextureName.SKY_1);
-					// } else if (j == 13) {
-					// 	texture = Shroomite.textures.get(TextureName.SKY_2);
-					// } else if (j == 12) {
-					// 	texture = Shroomite.textures.get(TextureName.SKY_3);
-					// } else {
-					// 	texture = Shroomite.textures.get(TextureName.SKY_4);
-					// }
-					// drawBlockRegion(texture, i, j);
-				}
+                }
 			}
 		}
 	}

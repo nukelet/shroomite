@@ -22,7 +22,10 @@ public enum TextureName {
     SKY_WITH_CLOUDS("sky-with-clouds"),
     ADVENTURER_IDLE("adventurer-idle-00"),
     LEVEL_EXIT("level_exit"),
-    LEVER("lever");
+    LEVER("lever"),
+    WALL_LEFT("wall_left"),
+    WALL_MID("wall_mid"),
+    WALL_RIGHT("wall_right");
 
     private String assetName;
 
