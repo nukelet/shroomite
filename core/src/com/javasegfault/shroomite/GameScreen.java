@@ -41,18 +41,17 @@ public class GameScreen extends ScreenAdapter {
 	private int GRID_WIDTH = Shroomite.GRID_WIDTH;
 	private int GRID_HEIGHT = Shroomite.GRID_HEIGHT;
 
-    private IWorld world = new World(GRID_WIDTH, GRID_HEIGHT);
-    private Physics physics = new Physics(world);
-    private PlayerAgent player = new PlayerAgent(world, new Vector2(3.0f * BLOCK_WIDTH, 20.0f * BLOCK_HEIGHT));
+    private IWorld world;
+    private Physics physics;
+    private PlayerAgent player;
+    Array<UnlockableEntity> unlockableEntities;
+    LevelExit levelExit;
 
     private float framesPerSecond;
     private Position bottomLeftMousePosition;
     private Position mouseGridPosition;
     private Block blockPointedAt;
     private Position playerGridPosition;
-
-    Array<UnlockableEntity> unlockableEntities;
-    LevelExit levelExit;
 
     TextureAtlas atlas = new TextureAtlas("atlas/shroomite_textures.atlas");
     Animation<TextureRegion> playerAnimation =
@@ -66,11 +65,13 @@ public class GameScreen extends ScreenAdapter {
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 600);
 
-		// generateWorld();
-
         // for some reason the "./" path is defaulted to the assets folder
-        String fileName = "test_level_sand.grid";
-        world = WorldGenerator.generateWorld("worlds/" + fileName);
+        String fileName = "worlds/test_level_1.grid";
+        WorldGenerator worldGenerator = new WorldGenerator(fileName);
+        world = worldGenerator.getWorld();
+        player = worldGenerator.getPlayer();
+        unlockableEntities = worldGenerator.getUnlockableEntities();
+        levelExit = worldGenerator.getLevelExit();
 
         physics = new Physics(world);
 
