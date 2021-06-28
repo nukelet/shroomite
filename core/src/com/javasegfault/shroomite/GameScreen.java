@@ -7,7 +7,11 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
@@ -47,6 +51,15 @@ public class GameScreen extends ScreenAdapter {
     private Position mouseGridPosition;
     private Block blockPointedAt;
     private Position playerGridPosition;
+
+    Array<UnlockableEntity> unlockableEntities;
+    LevelExit levelExit;
+
+    TextureAtlas atlas = new TextureAtlas("atlas/shroomite_textures.atlas");
+    Animation<TextureRegion> playerAnimation =
+        new Animation<TextureRegion>(0.125f, atlas.findRegions("elf_m_idle_anim"), PlayMode.LOOP);
+
+    float stateTime;
 
     public GameScreen(final Shroomite game) {
 		this.game = game;
@@ -172,12 +185,15 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void drawPlayer() {
-        game.batch.draw(player.getTexture(), player.getPosition().x, player.getPosition().y,
+        TextureRegion idleTexture = playerAnimation.getKeyFrame(stateTime, true);
+        // game.batch.draw(player.getTexture(), player.getPosition().x, player.getPosition().y,
+        //         player.getTextureWidth(), player.getTextureHeight());
+        game.batch.draw(idleTexture, player.getPosition().x, player.getPosition().y,
                 player.getTextureWidth(), player.getTextureHeight());
     }
 
     private void drawDebugInfoBackground() {
-        shapeRenderer.setColor(Color.BLACK);
+        shapeRenderer.setColor(0f, 0f, 0f, 0.2f);
         shapeRenderer.rect(538, 300, 252, 238);
     }
 
