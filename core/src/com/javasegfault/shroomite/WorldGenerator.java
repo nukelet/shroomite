@@ -15,8 +15,6 @@ import com.javasegfault.shroomite.blocks.WoodBlock;
 import com.javasegfault.shroomite.util.Position;
 
 public class WorldGenerator {
-    private static String fileName;
-
     public static World generateWorld(String fileName) {
         File file = new File(fileName);
         BufferedReader reader = null;

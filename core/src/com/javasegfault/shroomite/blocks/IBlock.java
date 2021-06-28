@@ -12,8 +12,6 @@ public interface IBlock {
 
     Texture getTexture();
 
-    void render();
-
     void destroySelf();
 
     void move(Position pos);

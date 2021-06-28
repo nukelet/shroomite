@@ -33,14 +33,6 @@ public class WoodBlock extends Block {
 	}
 
 	@Override
-	public void render() {
-		super.render();
-		// if (onFire) {
-		// 	game.drawBlockRegion(Shroomite.textures.get(TextureName.FIRE), position.getX(), position.getY());
-		// }
-	}
-
-	@Override
 	public String toString() {
 		return String.format("WoodBlock(position=%s, onFire=%b)", position.toString(), onFire);
 	}

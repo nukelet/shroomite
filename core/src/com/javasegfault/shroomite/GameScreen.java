@@ -331,8 +331,7 @@ public class GameScreen extends ScreenAdapter {
 		}
 
         if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)) {
-            long currentTime = TimeUtils.millis();
-            if (currentTime - lastPhysicsCallTime > 17) {
+            if (TimeUtils.timeSinceMillis(lastPhysicsCallTime) > 17) {
                 physics.updatePositions();
                 physics.updateInteractions();
                 lastPhysicsCallTime = TimeUtils.millis();

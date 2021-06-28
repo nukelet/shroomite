@@ -32,15 +32,7 @@ public abstract class Block implements IBlock {
         this.position = position;
     }
 
-    // TODO: this should probably be delegated to the graphics component
-    // maybe the block should only store a reference to a TextureName object
-	// public void render() {
-	// 	game.drawBlockRegion(getTexture(), position.getX(), position.getY());
-	// }
-
-    public void render() {
-
-    }
+    public abstract void accept(IBlockVisitor visitor);
 
     @Override
     public void destroySelf() {
