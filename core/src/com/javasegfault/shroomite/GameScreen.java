@@ -67,6 +67,7 @@ public class GameScreen extends ScreenAdapter {
     private Position mouseGridPosition;
     private Block blockPointedAt;
     private Position playerGridPosition;
+    private Vector2 lastHorizontalVelocityChange = new Vector2(1, 0);
 
     TextureAtlas atlas = new TextureAtlas("atlas/shroomite_textures.atlas");
     Animation<TextureRegion> playerAnimation =
@@ -99,8 +100,6 @@ public class GameScreen extends ScreenAdapter {
 
         GRID_WIDTH = world.getWidth();
         GRID_HEIGHT = world.getHeight();
-
-        player = new PlayerAgent(world, new Vector2(3*BLOCK_WIDTH, 10*BLOCK_HEIGHT));
 
         bottomLeftMousePosition = new Position(-1, -1);
         mouseGridPosition = new Position(-1, -1);
@@ -140,6 +139,11 @@ public class GameScreen extends ScreenAdapter {
         camera.update();
 
         handleInput();
+        if (TimeUtils.timeSinceMillis(lastPhysicsCallTime) > 17) {
+            physics.updatePositions();
+            physics.updateInteractions();
+            lastPhysicsCallTime = TimeUtils.millis();
+        }
 
         physics.updatePlayer(player, delta);
 
@@ -158,11 +162,17 @@ public class GameScreen extends ScreenAdapter {
         }
 
         if (isDoorUnlocked && player.overlaps(levelExit)) {
-            gameState = GameState.LEVEL_COMPLETE;
+            if (gameState != GameState.LEVEL_COMPLETE) {
+                gameState = GameState.LEVEL_COMPLETE;
+                completeWorld();
+            }
         }
 
         if (player.getHp() < 0) {
-            gameState = GameState.GAME_OVER;
+            if (gameState != GameState.GAME_OVER) {
+                gameState = GameState.GAME_OVER;
+                failWorld();
+            }
         }
 
         ScreenUtils.clear(0, 0, 0.2f, 1);
@@ -250,10 +260,15 @@ public class GameScreen extends ScreenAdapter {
 
     private void drawPlayer() {
         TextureRegion idleTexture = playerAnimation.getKeyFrame(stateTime, true);
-        // game.batch.draw(player.getTexture(), player.getPosition().x, player.getPosition().y,
-        //         player.getTextureWidth(), player.getTextureHeight());
-        game.batch.draw(idleTexture, player.getPosition().x, player.getPosition().y,
-                player.getTextureWidth(), player.getTextureHeight());
+        Vector2 vel = player.getSpeed();
+        if (vel.x >= 0) {
+            game.batch.draw(idleTexture, player.getPosition().x, player.getPosition().y,
+                    player.getTextureWidth(), player.getTextureHeight());
+        } else {
+            float width = player.getTextureWidth();
+            game.batch.draw(idleTexture, player.getPosition().x + width, player.getPosition().y,
+                    -player.getTextureWidth(), player.getTextureHeight());
+        }
     }
 
     private void drawDebugInfoBackground() {
@@ -281,14 +296,14 @@ public class GameScreen extends ScreenAdapter {
 
         text += "\nInteracting: " + (player.interacting ? "yes" : "no");
 
-        boolean leverLocked = true;
+        boolean leversUnlocked = true;
         for (UnlockableEntity lever : unlockableEntities) {
-            if (!lever.isLocked()) {
-                leverLocked = false;
+            if (lever.isLocked()) {
+                leversUnlocked = false;
                 break;
             }
         }
-        text += "\nLever locked: " + (leverLocked ? "yes" : "no");
+        text += "\nLevers unlocked: " + (leversUnlocked ? "yes" : "no");
 
         debugInfoLabel.setText(text);
     }
@@ -325,6 +340,11 @@ public class GameScreen extends ScreenAdapter {
         cwd.show(stage);
     }
 
+    public void failWorld() {
+        FailedWorldDialog cwd = new FailedWorldDialog(game.skin, this);
+        cwd.show(stage);
+    }
+
 	public void drawBlockRegion(Texture texture, int gridPosX, int gridPosY) {
 		game.batch.draw(texture, gridPosX*BLOCK_WIDTH, gridPosY*BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT);
 	}
@@ -339,7 +359,6 @@ public class GameScreen extends ScreenAdapter {
             Vector3 mousePos = new Vector3(0, 0, 0);
             mousePos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             camera.unproject(mousePos);
-//            System.out.println("x = " + mousePos.x + ", y = " + mousePos.y);
             int mouseWorldPosX = (int) (mousePos.x / BLOCK_WIDTH);
             int mouseWorldPosY = (int) (mousePos.y / BLOCK_HEIGHT);
 
@@ -353,25 +372,16 @@ public class GameScreen extends ScreenAdapter {
                 }
 
                 lastMousePressTime = currentTime;
-
-                // if (block != null && block.getType() == BlockType.WATER) {
-                //     Position pos = block.getPosition();
-
-                //     System.out.println(world.getBlockAt(pos.up()));
-                //     System.out.println(world.getBlockAt(pos.down()));
-                //     System.out.println(world.getBlockAt(pos.left()));
-                //     System.out.println(world.getBlockAt(pos.right()));
-                // }
             }
 		}
 
-        if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)) {
-            if (TimeUtils.timeSinceMillis(lastPhysicsCallTime) > 17) {
-                physics.updatePositions();
-                physics.updateInteractions();
-                lastPhysicsCallTime = TimeUtils.millis();
-            }
-        }
+        // if (Gdx.input.isKeyPressed(Keys.SHIFT_LEFT)) {
+        //     if (TimeUtils.timeSinceMillis(lastPhysicsCallTime) > 17) {
+        //         physics.updatePositions();
+        //         physics.updateInteractions();
+        //         lastPhysicsCallTime = TimeUtils.millis();
+        //     }
+        // }
 
         if (Gdx.input.isKeyPressed(Keys.E)) {
             if (!player.interacting) {

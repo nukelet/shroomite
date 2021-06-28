@@ -13,7 +13,7 @@ public class LavaBlock extends LiquidBlock {
         this.liquid = true;
 
         this.maxMass = 100;
-        this.flowCoefficient = 0.7f;
+        this.flowCoefficient = 0.6f;
         this.mass = this.maxMass;
 	}
 

@@ -20,7 +20,10 @@ public class ChooseWorldDialog extends Dialog {
 
         this.mainMenuScreen = mainMenuScreen;
 
-        FileHandle worldsDir = Gdx.files.internal("worlds");
+        String directory = System.getProperty("user.dir");
+        FileHandle worldsDir = Gdx.files.absolute(directory+"/worlds");
+        System.out.println(worldsDir.path());
+
         FileHandle worlds[] = worldsDir.list();
         Array<String> worldsNames = new Array<String>();
         for (FileHandle world : worlds) {

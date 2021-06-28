@@ -1,7 +1,7 @@
 package com.javasegfault.shroomite.entities;
 
 public enum StatusEffect {
-    FIRE(500, 5000, 4);
+    FIRE(500, 8000, 4);
 
     private final long duration;
     private final long tickDuration;

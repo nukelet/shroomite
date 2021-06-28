@@ -14,7 +14,7 @@ public class PlayerEntityVisitor implements IEntityVisitor {
     }
 
     public void visitLevelExit(LevelExit level) {
-        System.out.println("yeet");
+
     }
 
     public void visitLever(Lever lever) {

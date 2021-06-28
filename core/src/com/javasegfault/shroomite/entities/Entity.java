@@ -74,7 +74,7 @@ public abstract class Entity implements IEntity {
         return new Rectangle(textureRect);
     }
 
-    public boolean overlaps(Entity entity) {
+    public boolean overlaps(IEntity entity) {
         return hitbox.overlaps(entity.getHitbox());
     }
 
