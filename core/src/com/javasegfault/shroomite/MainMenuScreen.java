@@ -35,8 +35,8 @@ public class MainMenuScreen extends ScreenAdapter {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 // Fechar esta janela e iniciar o jogo
-                dispose();
-                game.setScreen(new GameScreen(game));
+                ChooseWorldDialog chooseWorldDialog = new ChooseWorldDialog(game.skin, MainMenuScreen.this);
+                chooseWorldDialog.show(stage);
             }
         });
         rootTable.add(playGameButton).width(200).space(10);
@@ -80,5 +80,10 @@ public class MainMenuScreen extends ScreenAdapter {
     @Override
     public void dispose() {
         stage.dispose();
+    }
+
+    public void startGame(String worldName) {
+        dispose();
+        game.setScreen(new GameScreen(game, worldName));
     }
 }
