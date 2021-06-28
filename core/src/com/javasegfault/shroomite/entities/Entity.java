@@ -3,6 +3,7 @@ package com.javasegfault.shroomite.entities;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.javasegfault.shroomite.IWorld;
 import com.javasegfault.shroomite.Shroomite;
 import com.javasegfault.shroomite.TextureName;
 import com.javasegfault.shroomite.World;
@@ -13,7 +14,7 @@ public abstract class Entity implements IEntity {
     // position measured from bottom left corner
     protected Vector2 position;
 
-    protected World world;
+    protected IWorld world;
     protected IBlockVisitor blockVisitor;
     protected IEntityVisitor entityVisitor;
     // separate the hitbox rectangle from the texture rectangle
@@ -21,18 +22,24 @@ public abstract class Entity implements IEntity {
     protected Rectangle textureRect;
 
     // TODO: hard-coded
-    public Entity(World world, Vector2 position) {
+    public Entity(IWorld world, Vector2 position) {
         this.world = world;
         this.position = position;
 
-        float HITBOX_WIDTH = 50;
-        float HITBOX_HEIGHT = 50;
-        float TEXTURE_WIDTH = 70;
-        float TEXTURE_HEIGHT = 60;
+        float HITBOX_WIDTH = 30;
+        float HITBOX_HEIGHT = 30;
+        float TEXTURE_WIDTH = 30;
+        float TEXTURE_HEIGHT = 40;
 
         this.hitbox = new Rectangle(position.x, position.y,
                 HITBOX_WIDTH, HITBOX_HEIGHT);
-        this.textureRect = new Rectangle(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+        this.textureRect = new Rectangle(hitbox.x, hitbox.y, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+        adjustTextureRect();
+    }
+
+    private void adjustTextureRect() {
+        textureRect.setCenter(hitbox.getCenter(new Vector2()));
+        textureRect.setY(hitbox.y);
     }
 
     public float getWidth() {
@@ -43,13 +50,13 @@ public abstract class Entity implements IEntity {
         return hitbox.height;
     }
 
-    // public float getTextureWidth() {
-    //     return this.TEXTURE_WIDTH;
-    // }
+    public float getTextureWidth() {
+        return textureRect.width;
+    }
 
-    // public float getTextureHeight() {
-    //     return this.TEXTURE_HEIGHT;
-    // }
+    public float getTextureHeight() {
+        return textureRect.height;
+    }
 
     public Rectangle getHitbox() {
         return new Rectangle(hitbox);
@@ -78,11 +85,15 @@ public abstract class Entity implements IEntity {
         block.accept(blockVisitor);
     }
 
+    public void interact(Entity entity) {
+        entity.accept(entityVisitor);
+    }
+
     public abstract void accept(IEntityVisitor visitor);
 
     // TODO: change this to setPosition
     public void move(Vector2 vec) {
-        this.position = vec;
+        setPosition(vec.x, vec.y);
     }
 
     // TODO: this should return a copy, something in the
@@ -98,9 +109,7 @@ public abstract class Entity implements IEntity {
     public void setPosition(float x, float y) {
         position.set(x, y);
         hitbox.setPosition(position);
-        Vector2 hitboxCenter = new Vector2();
-        hitbox.getCenter(hitboxCenter);
-        textureRect.setCenter(hitboxCenter);
+        adjustTextureRect();
     }
 
     public abstract Texture getTexture();

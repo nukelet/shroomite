@@ -20,7 +20,7 @@ public class PlayerBlockVisitor implements IBlockVisitor {
     }
 
     public void visitWaterBlock(WaterBlock block) {
-
+        player.removeStatusEffects(StatusEffect.FIRE);
     }
 
     public void visitDirtBlock(DirtBlock block) {
@@ -28,7 +28,7 @@ public class PlayerBlockVisitor implements IBlockVisitor {
     }
 
     public void visitLavaBlock(LavaBlock block) {
-
+        player.addStatusEffect(StatusEffect.FIRE);
     }
 
     public void visitWoodBlock(WoodBlock block) {

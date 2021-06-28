@@ -20,7 +20,9 @@ public enum TextureName {
     ROCK("rock"),
     WOOD("wood"),
     SKY_WITH_CLOUDS("sky-with-clouds"),
-    ADVENTURER_IDLE("adventurer-idle-00");
+    ADVENTURER_IDLE("adventurer-idle-00"),
+    LEVEL_EXIT("level_exit"),
+    LEVER("lever");
 
     private String assetName;
 

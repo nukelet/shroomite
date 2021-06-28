@@ -9,8 +9,6 @@ public enum StatusEffect {
     private long startTick;
     private long lastTick;
     
-    private StatusEffectType type;
-    
     // all in milliseconds
     StatusEffect(long tickDuration, long duration, int damage) {
         this.startTick = 0;
@@ -46,9 +44,5 @@ public enum StatusEffect {
 
     public int getDamage() {
         return damage;
-    }
-
-    public StatusEffectType getType() {
-        return type;
     }
 }

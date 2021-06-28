@@ -3,10 +3,10 @@ package com.javasegfault.shroomite.physics;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.javasegfault.shroomite.IWorld;
 import com.javasegfault.shroomite.Shroomite;
-import com.javasegfault.shroomite.agents.Agent;
-import com.javasegfault.shroomite.agents.PlayerAgent;
+import com.javasegfault.shroomite.entities.PlayerAgent;
 import com.javasegfault.shroomite.blocks.Block;
 import com.javasegfault.shroomite.blocks.IBlockVisitor;
 import com.javasegfault.shroomite.blocks.LiquidBlock;
@@ -101,7 +101,7 @@ public class Physics {
         }
     }
 
-    public void updateCollidingBlocks(Agent agent) {
+    public void updateCollidingBlocks(PlayerAgent agent) {
         collidingBlocks.clear();
 
         Vector2 agentPosition = agent.getPosition();
@@ -121,7 +121,7 @@ public class Physics {
         }
     }
 
-    public Array<Block> getCollidingBlocks(Agent player) {
+    public Array<Block> getCollidingBlocks(PlayerAgent player) {
         return this.collidingBlocks;
     }
 
@@ -165,10 +165,26 @@ public class Physics {
             }
         }
 
+        player.setPosition(pos);
+
+
         // block interaction update
         updateCollidingBlocks(player);
         for (Block block : collidingBlocks) {
             player.interact(block);
+        }
+        player.updateStatusEffects();
+
+        if (player.interacting) {
+            if (TimeUtils.timeSinceMillis(player.lastInteractionTick) > 100) {
+                player.interacting = false;
+            }
+        }
+
+        if (player.breakingBlock) {
+            if (TimeUtils.timeSinceMillis(player.lastBreakingBlockTick) > 100) {
+                player.interacting = false;
+            }
         }
     }
     

@@ -10,12 +10,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.javasegfault.shroomite.agents.PlayerAgent;
+import com.javasegfault.shroomite.entities.LevelExit;
+import com.javasegfault.shroomite.entities.Lever;
+import com.javasegfault.shroomite.entities.PlayerAgent;
+import com.javasegfault.shroomite.entities.StatusEffect;
+import com.javasegfault.shroomite.entities.UnlockableEntity;
 import com.javasegfault.shroomite.blocks.Block;
 import com.javasegfault.shroomite.blocks.LavaBlock;
 import com.javasegfault.shroomite.blocks.RockBlock;
@@ -52,18 +57,35 @@ public class GameScreen extends ScreenAdapter {
 		// generateWorld();
 
         // for some reason the "./" path is defaulted to the assets folder
-        String fileName = "test.grid";
+        String fileName = "test_level_sand.grid";
         world = WorldGenerator.generateWorld("worlds/" + fileName);
 
         physics = new Physics(world);
 
+        BLOCK_WIDTH = Shroomite.BLOCK_WIDTH;
+        BLOCK_HEIGHT = Shroomite.BLOCK_HEIGHT;
+
+        GRID_WIDTH = world.getWidth();
+        GRID_HEIGHT = world.getHeight();
+
+        player = new PlayerAgent(world, new Vector2(3*BLOCK_WIDTH, 10*BLOCK_HEIGHT));
+
         bottomLeftMousePosition = new Position(-1, -1);
         mouseGridPosition = new Position(-1, -1);
         playerGridPosition = new Position(-1, -1);
+
+        levelExit = new LevelExit(world, new Vector2(32, 32));
+        Lever lever = new Lever(world, new Vector2(32, 72));
+        unlockableEntities = new Array<UnlockableEntity>();
+        unlockableEntities.add(lever);
+
+        stateTime = 0;
 	}
 
     @Override
     public void render(float delta) {
+        stateTime += delta;
+
         framesPerSecond = 1 / Gdx.graphics.getDeltaTime();
         bottomLeftMousePosition.set(Gdx.input.getX(),
                 Gdx.graphics.getHeight() - Gdx.input.getY() - 1);
@@ -79,6 +101,12 @@ public class GameScreen extends ScreenAdapter {
 
         physics.updatePlayer(player, delta);
 
+        for (UnlockableEntity entity : unlockableEntities) {
+            if (player.overlaps(entity)) {
+                player.interact(entity);
+            }
+        }
+
         ScreenUtils.clear(0, 0, 0.2f, 1);
 
         game.batch.setProjectionMatrix(camera.combined);
@@ -87,10 +115,21 @@ public class GameScreen extends ScreenAdapter {
         game.batch.begin();
         renderWorld();
         drawCollidingBlocks();
+
+        Rectangle textureRect = levelExit.getTextureRect(); 
+        Vector2 pos = levelExit.getPosition();
+        game.batch.draw(levelExit.getTexture(), pos.x, pos.y, textureRect.x, textureRect.y);
+
+        for (UnlockableEntity entity : unlockableEntities) {
+            textureRect = entity.getTextureRect(); 
+            pos = entity.getPosition();
+            game.batch.draw(entity.getTexture(), pos.x, pos.y, textureRect.x, textureRect.y);
+        }
+        
         game.batch.end();
 
         shapeRenderer.begin(ShapeType.Line);
-        drawGridLines();
+        // drawGridLines();
         drawPlayerHitbox();
         shapeRenderer.end();
 
@@ -169,6 +208,29 @@ public class GameScreen extends ScreenAdapter {
         } else {
             font.draw(game.batch, "Block pointed at: NONE", 550, 380);
         }
+        
+        font.draw(game.batch, "HP: " + player.getHp(), 550, 360);
+
+        String effects = "";
+        for (StatusEffect effect : player.getStatusEffects()) {
+            effects += effect + "\n";
+        }
+
+        font.draw(game.batch, effects, 550, 340);
+
+        font.draw(game.batch,
+                "interacting: " + (player.interacting ? "yes" : "no"),
+                550, 320);
+
+        boolean leverLocked = true;
+        for (UnlockableEntity lever : unlockableEntities) {
+            if (!lever.isLocked()) {
+                leverLocked = false;
+            }
+        }
+        font.draw(game.batch,
+                "lever locked: " + (leverLocked ? "yes" : "no"),
+                550, 300);
     }
 
 	@Override
@@ -231,12 +293,16 @@ public class GameScreen extends ScreenAdapter {
 //            System.out.println("x = " + mousePos.x + ", y = " + mousePos.y);
             int mouseWorldPosX = (int) (mousePos.x / BLOCK_WIDTH);
             int mouseWorldPosY = (int) (mousePos.y / BLOCK_HEIGHT);
+            Position mouseWorldPos = new Position(mouseWorldPosX, mouseWorldPosY);
+
             if (currentTime - lastMousePressTime > 500) {
                 System.out.println("world coordinates: x = " + mouseWorldPosX + ", y = " + mouseWorldPosY);
                 Position mouseWorldPosition = new Position(mouseWorldPosX, mouseWorldPosY);
                 Block block = world.getBlockAt(mouseWorldPosition);
                 System.out.println(block);
                 lastMousePressTime = currentTime;
+                player.breakBlock(block);
+
                 // if (block != null && block.getType() == BlockType.WATER) {
                 //     Position pos = block.getPosition();
 
@@ -257,12 +323,12 @@ public class GameScreen extends ScreenAdapter {
             }
         }
 
-        /*
-         * 5 blocks
-         * 5*BLOCK_HEIGHT
-         * v0^2/2a = 5*BLOCK_HEIGHT
-         *
-         * */
+        if (Gdx.input.isKeyPressed(Keys.E)) {
+            if (!player.interacting) {
+                player.enableInteractions();
+            }
+        }
+
         if (Gdx.input.isKeyPressed(Keys.SPACE) && player.speed.y == 0) {
             player.setSpeed(player.speed.x, 400);
         }

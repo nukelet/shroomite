@@ -2,25 +2,60 @@ package com.javasegfault.shroomite.entities;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.TimeUtils;
+import com.javasegfault.shroomite.IWorld;
 import com.javasegfault.shroomite.Shroomite;
 import com.javasegfault.shroomite.TextureName;
 import com.javasegfault.shroomite.World;
+import com.javasegfault.shroomite.blocks.Block;
 import com.javasegfault.shroomite.blocks.IBlockVisitor;
 
 public class PlayerAgent extends Entity {
     public Vector2 speed;
 
-    private IBlockVisitor blockVisitor;
-
     private StatusEffectManager statusEffectManager;
+
+    public boolean interacting;
+    public long lastInteractionTick;
+
+    public boolean breakingBlock;
+    public long lastBreakingBlockTick;
 
     private int hp;
     private int stamina;
 
-    public PlayerAgent(World world, Vector2 position) {
+    public PlayerAgent(IWorld world, Vector2 position) {
         super(world, position);
         this.speed = new Vector2(0, 0);
         this.blockVisitor = new PlayerBlockVisitor(this);
+        this.entityVisitor = new PlayerEntityVisitor(this);
+        this.statusEffectManager = new StatusEffectManager(this);
+
+        hp = 100;
+        stamina = 100;
+
+        interacting = false;
+        lastInteractionTick = 0;
+
+        breakingBlock = false;
+        lastBreakingBlockTick = 0;
+    }
+
+    public void enableBreakingBlock() {
+        breakingBlock = true;
+        lastBreakingBlockTick = TimeUtils.millis();
+    }
+
+    public void breakBlock(Block block) {
+        if (TimeUtils.timeSinceNanos(lastBreakingBlockTick) > 100) {
+            block.destroySelf();
+        }
+    }
+
+    public void enableInteractions() {
+        interacting = true;
+        lastInteractionTick = TimeUtils.millis();
     }
 
     public void accept(IEntityVisitor visitor) {
@@ -43,8 +78,20 @@ public class PlayerAgent extends Entity {
         return Shroomite.textures.get(TextureName.ADVENTURER_IDLE);
     }
 
+    public void addStatusEffect(StatusEffect effect) {
+        statusEffectManager.addStatusEffect(effect);
+    }
+
+    public void removeStatusEffects(StatusEffect effect) {
+        statusEffectManager.removeStatusEffect(effect);
+    }
+
     public void updateStatusEffects() {
         statusEffectManager.updateStatusEffects();
+    }
+
+    public ObjectSet<StatusEffect> getStatusEffects() {
+        return statusEffectManager.getStatusEffects();
     }
 
     public void setHp(int hp) {
