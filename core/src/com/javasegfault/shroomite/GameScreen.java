@@ -31,6 +31,14 @@ import com.javasegfault.shroomite.physics.Physics;
 import com.javasegfault.shroomite.util.Position;
 
 public class GameScreen extends ScreenAdapter {
+    private enum GameState {
+        LEVEL_ONGOING,
+        LEVEL_COMPLETE,
+        GAME_OVER,
+    }
+
+    private GameState gameState;
+
 	private final Shroomite game;
 	private final String worldName;
 	private OrthographicCamera camera;
@@ -66,8 +74,8 @@ public class GameScreen extends ScreenAdapter {
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 600);
 
-        // for some reason the "./" path is defaulted to the assets folder
-        // this.worldName = worldName;
+        // libGDX looks for files in the core/assets/ folder
+        this.worldName = worldName;
         WorldGenerator worldGenerator = new WorldGenerator("worlds/" + worldName);
         world = worldGenerator.getWorld();
         player = worldGenerator.getPlayer();
@@ -88,12 +96,9 @@ public class GameScreen extends ScreenAdapter {
         mouseGridPosition = new Position(-1, -1);
         playerGridPosition = new Position(-1, -1);
 
-        levelExit = new LevelExit(world, new Vector2(32, 32));
-        Lever lever = new Lever(world, new Vector2(32, 72));
-        unlockableEntities = new Array<UnlockableEntity>();
-        unlockableEntities.add(lever);
-
         stateTime = 0;
+
+        gameState = GameState.LEVEL_ONGOING;
 	}
 
     @Override
@@ -121,6 +126,22 @@ public class GameScreen extends ScreenAdapter {
             }
         }
 
+        boolean isDoorUnlocked = true;
+        for (UnlockableEntity entity : unlockableEntities) {
+            if (entity.isLocked()) {
+                isDoorUnlocked = false;
+                break;
+            }
+        }
+
+        if (isDoorUnlocked && player.overlaps(levelExit)) {
+            gameState = GameState.LEVEL_COMPLETE;
+        }
+
+        if (player.getHp() < 0) {
+            gameState = GameState.GAME_OVER;
+        }
+
         ScreenUtils.clear(0, 0, 0.2f, 1);
 
         game.batch.setProjectionMatrix(camera.combined);
@@ -132,20 +153,20 @@ public class GameScreen extends ScreenAdapter {
         drawCollidingBlocks();
 
         Rectangle textureRect = levelExit.getTextureRect(); 
-        Vector2 pos = levelExit.getPosition();
-        game.batch.draw(levelExit.getTexture(), pos.x, pos.y, textureRect.x, textureRect.y);
+        game.batch.draw(levelExit.getTexture(), textureRect.x, textureRect.y,
+                textureRect.width, textureRect.height);
 
         for (UnlockableEntity entity : unlockableEntities) {
             textureRect = entity.getTextureRect(); 
-            pos = entity.getPosition();
-            game.batch.draw(entity.getTexture(), pos.x, pos.y, textureRect.x, textureRect.y);
+            game.batch.draw(entity.getTexture(), textureRect.x, textureRect.y,
+                    textureRect.width, textureRect.height);
         }
         
         game.batch.end();
 
         shapeRenderer.begin(ShapeType.Line);
         // drawGridLines();
-        drawPlayerHitbox();
+        drawEntityHitboxes();
         shapeRenderer.end();
 
         game.batch.begin();
@@ -181,9 +202,16 @@ public class GameScreen extends ScreenAdapter {
         }
     }
 
-    private void drawPlayerHitbox() {
+    private void drawEntityHitboxes() {
         shapeRenderer.setColor(1f, 1f, 1f, 1f);
-        shapeRenderer.rect(player.getPosition().x, player.getPosition().y, player.getWidth(), player.getHeight());
+        shapeRenderer.rect(player.getPosition().x, player.getPosition().y,
+                player.getWidth(), player.getHeight());
+        shapeRenderer.rect(levelExit.getPosition().x, levelExit.getPosition().y,
+                levelExit.getWidth(), levelExit.getHeight());
+        for (UnlockableEntity entity : unlockableEntities) {
+            shapeRenderer.rect(entity.getPosition().x, entity.getPosition().y,
+                    entity.getWidth(), entity.getHeight());
+        }
     }
 
     private void drawPlayer() {
@@ -251,6 +279,9 @@ public class GameScreen extends ScreenAdapter {
         font.draw(game.batch,
                 "lever locked: " + (leverLocked ? "yes" : "no"),
                 550, 300);
+
+        font.draw(game.batch,
+                "game state: " + gameState, 550, 280);
     }
 
 	@Override

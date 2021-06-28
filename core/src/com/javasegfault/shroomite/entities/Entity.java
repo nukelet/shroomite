@@ -37,7 +37,7 @@ public abstract class Entity implements IEntity {
         adjustTextureRect();
     }
 
-    private void adjustTextureRect() {
+    protected void adjustTextureRect() {
         textureRect.setCenter(hitbox.getCenter(new Vector2()));
         textureRect.setY(hitbox.y);
     }
@@ -68,8 +68,6 @@ public abstract class Entity implements IEntity {
 
     public void setTextureSize(float width, float height) {
         textureRect.setSize(width, height);
-        Vector2 hitboxCenter = hitbox.getCenter(new Vector2());
-        textureRect.setCenter(hitboxCenter);
     }
 
     public Rectangle getTextureRect() {
