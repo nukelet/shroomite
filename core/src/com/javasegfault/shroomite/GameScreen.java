@@ -4,30 +4,35 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet.ObjectSetIterator;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.javasegfault.shroomite.blocks.Block;
+import com.javasegfault.shroomite.blocks.LavaBlock;
+import com.javasegfault.shroomite.blocks.RockBlock;
 import com.javasegfault.shroomite.entities.LevelExit;
 import com.javasegfault.shroomite.entities.Lever;
 import com.javasegfault.shroomite.entities.PlayerAgent;
 import com.javasegfault.shroomite.entities.StatusEffect;
 import com.javasegfault.shroomite.entities.UnlockableEntity;
-import com.javasegfault.shroomite.blocks.Block;
-import com.javasegfault.shroomite.blocks.LavaBlock;
-import com.javasegfault.shroomite.blocks.RockBlock;
 import com.javasegfault.shroomite.physics.Physics;
 import com.javasegfault.shroomite.util.Position;
 
@@ -62,6 +67,10 @@ public class GameScreen extends ScreenAdapter {
 
     float stateTime;
 
+    private Stage stage;
+    private final Label infoLabel;
+    private final Label debugInfoLabel;
+
     public GameScreen(final Shroomite game, final String worldName) {
 		this.game = game;
 
@@ -94,6 +103,21 @@ public class GameScreen extends ScreenAdapter {
         unlockableEntities.add(lever);
 
         stateTime = 0;
+
+        stage = new Stage(new ScreenViewport());
+        Gdx.input.setInputProcessor(stage);
+
+        final Table rootTable = new Table();
+        rootTable.setFillParent(true);
+        stage.addActor(rootTable);
+
+        infoLabel = new Label(null, game.skin);
+        rootTable.add(infoLabel).align(Align.topLeft);
+
+        rootTable.add().grow();
+
+        debugInfoLabel = new Label(null, game.skin);
+        rootTable.add(debugInfoLabel).align(Align.topRight).width(250);
 	}
 
     @Override
@@ -130,16 +154,16 @@ public class GameScreen extends ScreenAdapter {
         renderWorld();
         drawCollidingBlocks();
 
-        Rectangle textureRect = levelExit.getTextureRect(); 
+        Rectangle textureRect = levelExit.getTextureRect();
         Vector2 pos = levelExit.getPosition();
         game.batch.draw(levelExit.getTexture(), pos.x, pos.y, textureRect.x, textureRect.y);
 
         for (UnlockableEntity entity : unlockableEntities) {
-            textureRect = entity.getTextureRect(); 
+            textureRect = entity.getTextureRect();
             pos = entity.getPosition();
             game.batch.draw(entity.getTexture(), pos.x, pos.y, textureRect.x, textureRect.y);
         }
-        
+
         game.batch.end();
 
         shapeRenderer.begin(ShapeType.Line);
@@ -151,13 +175,24 @@ public class GameScreen extends ScreenAdapter {
         drawPlayer();
         game.batch.end();
 
-        shapeRenderer.begin(ShapeType.Filled);
-        drawDebugInfoBackground();
-        shapeRenderer.end();
+//        shapeRenderer.begin(ShapeType.Filled);
+//        drawDebugInfoBackground();
+//        shapeRenderer.end();
 
         game.batch.begin();
         drawDebugInfo();
         game.batch.end();
+
+        String infoLabelText = String.format("HP: %d", player.getHp());
+        ObjectSetIterator<StatusEffect> it = player.getStatusEffects().iterator();
+        while (it.hasNext()) {
+            StatusEffect statusEffect = it.next();
+            infoLabelText += String.format("\n%s %ds", statusEffect.toString(), statusEffect.getRemainingTime() / 1000);
+        }
+        infoLabel.setText(infoLabelText);
+
+        stage.act();
+        stage.draw();
     }
 
     private void drawCollidingBlocks() {
@@ -199,69 +234,69 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void drawDebugInfo() {
-        font.draw(game.batch, String.format("World: %s", worldName), 550, 540);
+        String text = String.format("World: %s", worldName);
+        text += String.format("\n%.0f FPS", framesPerSecond);
+        text += String.format("\nPlayer position: (%.0f, %.0f)", player.getPosition().x, player.getPosition().y);
+        text += String.format("\nPlayer grid position: (%d, %d)", playerGridPosition.getX(), playerGridPosition.getY());
+        text += String.format("\nPlayer speed: (%.0f, %.0f)", player.getSpeed().x, player.getSpeed().y);
+        text += String.format("\nTL mouse position: (%d, %d)", Gdx.input.getX(), Gdx.input.getY());
+        text += String.format("\nBL mouse position: (%d, %d)", bottomLeftMousePosition.getX(), bottomLeftMousePosition.getY());
+        text += String.format("\nMouse grid position: (%d, %d)", mouseGridPosition.getX(), mouseGridPosition.getY());
+        text += String.format("\nBlock pointed at: %s", (blockPointedAt != null) ? blockPointedAt.getType() : "NONE");
+        text += String.format("\nHP: %d", player.getHp());
 
-        font.draw(game.batch, String.format("%.0f FPS", framesPerSecond), 550, 520);
-
-        font.draw(game.batch, String.format("Player position: (%.0f, %.0f)",
-                player.getPosition().x, player.getPosition().y), 550, 500);
-
-        font.draw(game.batch, String.format("Player grid position: (%d, %d)",
-                playerGridPosition.getX(), playerGridPosition.getY()), 550, 480);
-
-        font.draw(game.batch, String.format("Player speed: (%.0f, %.0f)",
-                player.getSpeed().x, player.getSpeed().y), 550, 460);
-
-        font.draw(game.batch, String.format("TL mouse position: (%d, %d)",
-                Gdx.input.getX(), Gdx.input.getY()), 550, 440);
-
-        font.draw(game.batch, String.format("BL mouse position: (%d, %d)",
-                bottomLeftMousePosition.getX(), bottomLeftMousePosition.getY()), 550, 420);
-
-        font.draw(game.batch, String.format("Mouse grid position: (%d, %d)",
-                mouseGridPosition.getX(), mouseGridPosition.getY()), 550, 400);
-
-        if (blockPointedAt != null) {
-            font.draw(game.batch, String.format("Block pointed at: %s",
-                    blockPointedAt.getType()), 550, 380);
-        } else {
-            font.draw(game.batch, "Block pointed at: NONE", 550, 380);
-        }
-        
-        font.draw(game.batch, "HP: " + player.getHp(), 550, 360);
-
-        String effects = "";
-        for (StatusEffect effect : player.getStatusEffects()) {
-            effects += effect + "\n";
+        ObjectSetIterator<StatusEffect> it = player.getStatusEffects().iterator();
+        while (it.hasNext()) {
+            StatusEffect statusEffect = it.next();
+            text += String.format("\n%s %ds", statusEffect.toString(), statusEffect.getRemainingTime() / 1000);
         }
 
-        font.draw(game.batch, effects, 550, 340);
-
-        font.draw(game.batch,
-                "interacting: " + (player.interacting ? "yes" : "no"),
-                550, 320);
+        text += "\nInteracting: " + (player.interacting ? "yes" : "no");
 
         boolean leverLocked = true;
         for (UnlockableEntity lever : unlockableEntities) {
             if (!lever.isLocked()) {
                 leverLocked = false;
+                break;
             }
         }
-        font.draw(game.batch,
-                "lever locked: " + (leverLocked ? "yes" : "no"),
-                550, 300);
+        text += "\nLever locked: " + (leverLocked ? "yes" : "no");
+
+        debugInfoLabel.setText(text);
     }
 
-	@Override
-	public void resize(int width, int height) {
-		
-	}
-	
-	@Override
-	public void dispose() {
-		
-	}
-	
+    @Override
+    public void resize(int width, int height) {
+        stage.getViewport().update(width, height, true);
+    }
+
+    @Override
+    public void dispose() {
+        stage.dispose();
+    }
+
+    public String getWorldName() {
+        return worldName;
+    }
+
+    public String getWorldNameWithoutFileExtension() {
+        return worldName.substring(0, worldName.lastIndexOf("."));
+    }
+
+    public int getPlayerHp() {
+        return player.getHp();
+    }
+
+    public void goToMainMenu() {
+        dispose();
+        game.setScreen(new MainMenuScreen(game));
+    }
+
+    public void completeWorld() {
+        CompletedWorldDialog cwd = new CompletedWorldDialog(game.skin, this);
+        cwd.show(stage);
+    }
+
 	public void drawBlockRegion(Texture texture, int gridPosX, int gridPosY) {
 		game.batch.draw(texture, gridPosX*BLOCK_WIDTH, gridPosY*BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT);
 	}
@@ -298,7 +333,7 @@ public class GameScreen extends ScreenAdapter {
             world.addBlock(new RockBlock(pos, world));
         }
     }
-	
+
     private long lastPhysicsCallTime = 0;
     private long lastMousePressTime = 0;
 
@@ -352,7 +387,7 @@ public class GameScreen extends ScreenAdapter {
         if (Gdx.input.isKeyPressed(Keys.SPACE) && player.speed.y == 0) {
             player.setSpeed(player.speed.x, 400);
         }
-        
+
         float speedX = 250;
         if (Gdx.input.isKeyPressed(Keys.D)) {
             player.setSpeed(speedX, player.speed.y);
