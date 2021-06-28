@@ -7,10 +7,12 @@ import com.javasegfault.shroomite.util.Position;
 public class GridCell {
     private Position position;
     private BlockType blockType;
+    private String entityType;
 
     public GridCell(Position position, BlockType blockType) {
         this.position = position;
         this.blockType = blockType;
+        this.entityType = null;
     }
 
     public Position getPosition() {
@@ -29,8 +31,43 @@ public class GridCell {
         this.blockType = blockType;
     }
 
+    public void removeBlockType() {
+        this.blockType = BlockType.AIR;
+    }
+
+    public boolean hasBlockType() {
+        return blockType != BlockType.AIR;
+    }
+
     public TextureName getBlockTypeTextureName() {
         return blockType.getTextureName();
+    }
+
+    public String getEntityType() {
+        return entityType;
+    }
+
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
+    }
+
+    public void removeEntityType() {
+        this.entityType = null;
+    }
+
+    public boolean hasEntity() {
+        return entityType != null;
+    }
+
+    public TextureName getEntityTypeTextureName() {
+        if (entityType.equals("PLAYER")) {
+            return TextureName.ADVENTURER_IDLE;
+        } else if (entityType.equals("LEVEL_EXIT")) {
+            return TextureName.LEVEL_EXIT;
+        } else if (entityType.equals("LEVER")) {
+            return TextureName.LEVER;
+        }
+        return null;
     }
 
     @Override

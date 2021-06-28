@@ -54,6 +54,10 @@ public class Grid {
         this.cells[y][x].setBlockType(blockType);
     }
 
+    public void removeCellBlockTypeAt(int x, int y) {
+        this.cells[y][x].removeBlockType();
+    }
+
     public TextureName getCellBlockTypeTextureNameAt(int x, int y) {
         return cells[y][x].getBlockTypeTextureName();
     }
@@ -61,7 +65,8 @@ public class Grid {
     public void clear() {
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                cells[i][j].setBlockType(BlockType.AIR);
+                cells[i][j].removeBlockType();
+                cells[i][j].removeEntityType();
             }
         }
     }
@@ -74,8 +79,25 @@ public class Grid {
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++) {
                     GridCell cell = cells[i][j];
-                    writer.printf("%d:%d,%s\n", cell.getPosition().getX(),
-                            cell.getPosition().getY(), cell.getBlockType().toValue());
+                    if (cell.hasBlockType()) {
+                        writer.printf("%d:%d,%s\n", cell.getPosition().getX(),
+                                cell.getPosition().getY(), cell.getBlockType().toValue());
+                    } else {
+                        writer.printf("%d:%d,AIR\n", cell.getPosition().getX(),
+                                cell.getPosition().getY());
+                    }
+                }
+            }
+
+            int entityCount = getEntityCount();
+            writer.printf("%d\n", entityCount);
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    GridCell cell = cells[i][j];
+                    if (cell.hasEntity()) {
+                        writer.printf("%d:%d,%s\n", cell.getPosition().getX(),
+                                cell.getPosition().getY(), cell.getEntityType());
+                    }
                 }
             }
         } catch (IOException e) {
@@ -85,6 +107,18 @@ public class Grid {
                 writer.close();
             }
         }
+    }
+
+    private int getEntityCount() {
+        int result = 0;
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                if (cells[i][j].hasEntity()) {
+                    result++;
+                }
+            }
+        }
+        return result;
     }
 
     public void loadState(String fileName) {
@@ -102,7 +136,8 @@ public class Grid {
             height = Integer.parseInt(gridWidthHeight[1]);
             cells = new GridCell[height][width];
 
-            while ((line = reader.readLine()) != null) {
+            for (int i = 0; i < width*height; i++) {
+                line = reader.readLine();
                 String positionBlockType[] = line.split(",");
                 String posXPosY[] = positionBlockType[0].split(":");
                 int posX = Integer.parseInt(posXPosY[0]);
@@ -110,6 +145,20 @@ public class Grid {
                 Position position = new Position(posX, posY);
                 BlockType blockType = BlockType.fromValue(positionBlockType[1]);
                 cells[posY][posX] = new GridCell(position, blockType);
+            }
+
+            line = reader.readLine();
+            if (line != null) {
+                int entityCount = Integer.parseInt(line);
+                for (int i = 0; i < entityCount; i++) {
+                    line = reader.readLine();
+                    String positionEntityType[] = line.split(",");
+                    String posXPosY[] = positionEntityType[0].split(":");
+                    int posX = Integer.parseInt(posXPosY[0]);
+                    int posY = Integer.parseInt(posXPosY[1]);
+                    String entityType = positionEntityType[1];
+                    cells[posY][posX].setEntityType(entityType);
+                }
             }
         } catch (IOException e) {
             // Indicar este erro para o usuário de forma visual, provavelmente através de um Dialog,

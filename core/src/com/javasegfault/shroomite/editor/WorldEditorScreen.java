@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -32,6 +33,7 @@ public class WorldEditorScreen extends ScreenAdapter {
     private final GridTable gridTable;
     private final List<BlockType> blockTypeList;
     private final StatusBarLabel statusBarLabel;
+    private final List<String> entitiesList;
 
     public WorldEditorScreen(final Shroomite game) {
         this.game = game;
@@ -45,7 +47,7 @@ public class WorldEditorScreen extends ScreenAdapter {
         gridTable.updateCellsDrawables();
 
         toolsList = new List<String>(game.skin);
-        toolsList.setItems(new String[] { "Pencil", "Eraser" });
+        toolsList.setItems(new String[] { "Block", "Entity", "Eraser" });
         toolsList.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -61,6 +63,9 @@ public class WorldEditorScreen extends ScreenAdapter {
                 statusBarLabel.updateText();
             }
         });
+
+        entitiesList = new List<String>(game.skin);
+        entitiesList.setItems(new String[] { "PLAYER", "LEVER", "LEVEL_EXIT" });
 
         lastMousePosition = OUT_OF_GRID_POSITION;
 
@@ -129,15 +134,36 @@ public class WorldEditorScreen extends ScreenAdapter {
 
         // Barra de ferramentas lateral
         table.row();
+
+        final Label toolbarLabel = new Label("Tools", game.skin);
         final ScrollPane toolbarPane = new ScrollPane(toolsList, game.skin);
-        table.add(toolbarPane).align(Align.topLeft).width(100).pad(40, 0, 40, 0);
+        final VerticalGroup toolbarGroup = new VerticalGroup();
+        toolbarGroup.addActor(toolbarLabel);
+        toolbarGroup.addActor(toolbarPane);
+        toolbarGroup.grow();
+        table.add(toolbarGroup).align(Align.topLeft).width(100);
 
         // Área central, onde fica a grid
         table.add(gridTable).grow();
 
         // Menu lateral de seleção de blocos
-        final ScrollPane blocksScrollPane = new ScrollPane(blockTypeList);
-        table.add(blocksScrollPane).align(Align.topRight).width(100).pad(40, 0, 40, 0);
+        final Label blocksLabel = new Label("Blocks", game.skin);
+        final ScrollPane blocksScrollPane = new ScrollPane(blockTypeList, game.skin);
+        final VerticalGroup blocksGroup = new VerticalGroup();
+        blocksGroup.addActor(blocksLabel);
+        blocksGroup.addActor(blocksScrollPane);
+        blocksGroup.grow();
+        final Label entityLabel = new Label("Entities", game.skin);
+        final ScrollPane entityPane = new ScrollPane(entitiesList, game.skin);
+        final VerticalGroup entityGroup = new VerticalGroup();
+        entityGroup.addActor(entityLabel);
+        entityGroup.addActor(entityPane);
+        entityGroup.grow();
+        final Table rightMenuTable = new Table(game.skin);
+        rightMenuTable.add(blocksGroup).growX().pad(20, 0, 20, 0);
+        rightMenuTable.row();
+        rightMenuTable.add(entityGroup).growX();
+        table.add(rightMenuTable).align(Align.topRight).width(100).pad(20, 0, 20, 0);
 
         // Barra de status
         table.row();
@@ -189,6 +215,10 @@ public class WorldEditorScreen extends ScreenAdapter {
 
     public BlockType getSelectedBlockType() {
         return blockTypeList.getSelected();
+    }
+
+    public String getSelectedEntity() {
+        return entitiesList.getSelected();
     }
 
     public String getReferencedFileName() {

@@ -28,8 +28,41 @@ public class GridTableCell extends Image {
         setDrawable(Shroomite.texturesDrawables.get(blockType.getTextureName()));
     }
 
+    public void removeGridCellBlockType() {
+        gridCell.removeBlockType();
+        setDrawable(Shroomite.defaultTextureDrawable);
+    }
+
+    public void setGridCellEntityType(String entityType) {
+        gridCell.setEntityType(entityType);
+        setDrawable(Shroomite.texturesDrawables.get(gridCell.getEntityTypeTextureName()));
+    }
+
+    public void removeGridCellEntityType() {
+        gridCell.removeEntityType();
+        setDrawable(Shroomite.defaultTextureDrawable);
+    }
+
     public void updateDrawable() {
+        if (gridCell.hasEntity()) {
+            setDrawable(Shroomite.texturesDrawables.get(gridCell.getEntityTypeTextureName()));
+        } else if (gridCell.hasBlockType()) {
+            setDrawable(Shroomite.texturesDrawables.get(gridCell.getBlockTypeTextureName()));
+        } else {
+            setDrawable(Shroomite.defaultTextureDrawable);
+        }
+    }
+
+    private void setDefaultDrawable() {
+        setDrawable(Shroomite.defaultTextureDrawable);
+    }
+
+    private void setBlockTypeDrawable() {
         setDrawable(Shroomite.texturesDrawables.get(gridCell.getBlockTypeTextureName()));
+    }
+
+    private void setEntityTypeDrawable() {
+        setDrawable(Shroomite.texturesDrawables.get(gridCell.getEntityTypeTextureName()));
     }
 
     private void addMainClickListener() {
@@ -37,12 +70,18 @@ public class GridTableCell extends Image {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 String selectedTool = worldEditorScreen.getSelectedTool();
-                if (selectedTool.equals("Pencil")) {
+                if (selectedTool.equals("Block")) {
+                    gridCell.removeEntityType();
                     gridCell.setBlockType(worldEditorScreen.getSelectedBlockType());
-                    updateDrawable();
+                    setBlockTypeDrawable();
+                } else if (selectedTool.equals("Entity")) {
+                    gridCell.removeBlockType();
+                    gridCell.setEntityType(worldEditorScreen.getSelectedEntity());
+                    setEntityTypeDrawable();
                 } else if (selectedTool.equals("Eraser")) {
-                    gridCell.setBlockType(BlockType.AIR);
-                    updateDrawable();
+                    gridCell.removeBlockType();
+                    gridCell.removeEntityType();
+                    setDefaultDrawable();
                 }
 
                 return true;
@@ -65,10 +104,15 @@ public class GridTableCell extends Image {
                     return;
 
                 String selectedTool = worldEditorScreen.getSelectedTool();
-                if (selectedTool.equals("Pencil")) {
+                if (selectedTool.equals("Block")) {
+                    toGridTableCell.removeGridCellEntityType();
                     toGridTableCell.setGridCellBlockType(worldEditorScreen.getSelectedBlockType());
+                } else if (selectedTool.equals("Entity")) {
+                    toGridTableCell.removeGridCellBlockType();
+                    toGridTableCell.setGridCellEntityType(worldEditorScreen.getSelectedEntity());
                 } else if (selectedTool.equals("Eraser")) {
-                    toGridTableCell.setGridCellBlockType(BlockType.AIR);
+                    toGridTableCell.removeGridCellBlockType();
+                    toGridTableCell.removeGridCellEntityType();
                 }
             }
         });
