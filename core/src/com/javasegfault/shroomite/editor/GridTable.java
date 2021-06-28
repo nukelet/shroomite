@@ -12,6 +12,7 @@ public class GridTable extends Table {
         super(skin);
         this.worldEditorScreen = worldEditorScreen;
         setGrid(grid);
+        defaults().grow();
     }
 
     public void setGrid(Grid grid) {
@@ -44,7 +45,7 @@ public class GridTable extends Table {
         clear();
         for (int i = grid.getHeight() - 1; i >= 0; i--) {
             for (int j = 0; j < grid.getWidth(); j++) {
-                add(cells[i][j]).grow();
+                add(cells[i][j]);
             }
             row();
         }

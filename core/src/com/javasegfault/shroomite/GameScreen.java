@@ -33,6 +33,7 @@ import com.javasegfault.shroomite.util.Position;
 
 public class GameScreen extends ScreenAdapter {
 	private final Shroomite game;
+	private final String worldName;
 	private OrthographicCamera camera;
     private ShapeRenderer shapeRenderer = new ShapeRenderer();
     private BitmapFont font = new BitmapFont();
@@ -61,7 +62,7 @@ public class GameScreen extends ScreenAdapter {
 
     float stateTime;
 
-    public GameScreen(final Shroomite game) {
+    public GameScreen(final Shroomite game, final String worldName) {
 		this.game = game;
 
 		camera = new OrthographicCamera();
@@ -70,8 +71,8 @@ public class GameScreen extends ScreenAdapter {
 		// generateWorld();
 
         // for some reason the "./" path is defaulted to the assets folder
-        String fileName = "test_level_sand.grid";
-        world = WorldGenerator.generateWorld("worlds/" + fileName);
+        this.worldName = worldName;
+        world = WorldGenerator.generateWorld("worlds/" + worldName);
 
         physics = new Physics(world);
 
@@ -194,10 +195,12 @@ public class GameScreen extends ScreenAdapter {
 
     private void drawDebugInfoBackground() {
         shapeRenderer.setColor(0f, 0f, 0f, 0.2f);
-        shapeRenderer.rect(538, 300, 252, 238);
+        shapeRenderer.rect(538, 280, 252, 268);
     }
 
     private void drawDebugInfo() {
+        font.draw(game.batch, String.format("World: %s", worldName), 550, 540);
+
         font.draw(game.batch, String.format("%.0f FPS", framesPerSecond), 550, 520);
 
         font.draw(game.batch, String.format("Player position: (%.0f, %.0f)",
