@@ -1,10 +1,10 @@
 package com.javasegfault.shroomite.blocks;
 
 public interface IBlockVisitor {
-    public void visitRockBlock(RockBlock block);
-    public void visitWaterBlock(WaterBlock block);
-    public void visitDirtBlock(DirtBlock block);
-    public void visitLavaBlock(LavaBlock block);
-    public void visitWoodBlock(WoodBlock block);
-    public void visitSandBlock(SandBlock block);
+    void visitRockBlock(RockBlock block);
+    void visitWaterBlock(WaterBlock block);
+    void visitDirtBlock(DirtBlock block);
+    void visitLavaBlock(LavaBlock block);
+    void visitWoodBlock(WoodBlock block);
+    void visitSandBlock(SandBlock block);
 }

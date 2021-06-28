@@ -24,76 +24,69 @@ public class World implements IWorld {
         return this.height;
     }
 
-    /**
-     * Adds block to world at the given position.
-     * 
-     * @param position
-     * @param block
-     * @return True if position is valid, false otherwise.
-     */
     @Override
-    public boolean setBlockAt(Position position, Block block) {
-        if (!isValidPosition(position)) {
+    public boolean setBlock(Block block) {
+        Position blockPosition = block.getPosition();
+        if (!isValidPosition(blockPosition)) {
+            System.err.printf("Invalid block add at %s: invalid position\n", blockPosition);
             return false;
         }
 
-        setBlockAtNoCheck(position, block);
+        setBlockAtNoCheck(blockPosition, block);
         return true;
     }
 
     @Override
-    public void addBlock(Block block) {
-        Position pos = block.getPosition();
-        if (!isValidPosition(pos)) {
-            System.err.printf("Invalid block add at %s: invalid position\n", pos);
-            return;
-        }
-
-        if (hasBlockAtNoCheck(pos)) {
-            System.err.printf("Invalid block add at %s: position not empty\n", pos);
-            return;
-        }
-
-        blocks[pos.getX()][pos.getY()] = block;
-    }
-
-    /**
-     * Adds block to world at the given position if the position is empty.
-     * 
-     * @param position
-     * @param block
-     * @return True if position is valid and there is no block at given position,
-     *         false otherwise.
-     */
-    @Override
-    public boolean addBlockAt(Position position, Block block) {
+    public boolean setBlockAt(Position position, Block block) {
         if (!isValidPosition(position)) {
-            return false;
-        }
-
-        if (hasBlockAtNoCheck(position)) {
+            System.err.printf("Invalid block add at %s: invalid position\n", position);
             return false;
         }
 
         setBlockAtNoCheck(position, block);
+        block.setPosition(position);
+        return true;
+    }
+
+    @Override
+    public boolean addBlock(Block block) {
+        Position blockPosition = block.getPosition();
+        if (!isValidPosition(blockPosition)) {
+            System.err.printf("Invalid block add at %s: invalid position\n", blockPosition);
+            return false;
+        }
+
+        if (hasBlockAtNoCheck(blockPosition)) {
+            System.err.printf("Invalid block add at %s: position not empty\n", blockPosition);
+            return false;
+        }
+
+        setBlockAtNoCheck(blockPosition, block);
+        return true;
+    }
+
+    @Override
+    public boolean addBlockAt(Position position, Block block) {
+        if (!isValidPosition(position)) {
+            System.err.printf("Invalid block add at %s: invalid position\n", position);
+            return false;
+        }
+
+        if (hasBlockAtNoCheck(position)) {
+            System.err.printf("Invalid block add at %s: position not empty\n", position);
+            return false;
+        }
+
+        setBlockAtNoCheck(position, block);
+        block.setPosition(position);
         return true;
     }
 
     @Deprecated
     public Block getBlockAt(int x, int y) {
-        if (!isValidPosition(x, y)) {
-            // System.err.printf("Invalid access to position Position(x=%d, y=%d): out of
-            // bounds\n", x, y);
-            return null;
-        } else {
-            return blocks[x][y];
-        }
+        return getBlockAt(new Position(x, y));
     }
 
-    /**
-     * @param position
-     * @return Block at given position or null if position is not valid.
-     */
     @Override
     public Block getBlockAt(Position position) {
         if (!isValidPosition(position)) {
@@ -106,7 +99,7 @@ public class World implements IWorld {
     @Override
     public boolean hasBlockAt(Position position) {
         if (!isValidPosition(position)) {
-            System.err.printf("Invalid position: %s\n", position);
+//            System.err.printf("Invalid position: %s\n", position);
             return false;
         }
 
@@ -115,20 +108,9 @@ public class World implements IWorld {
 
     @Deprecated
     public void removeBlock(Block block) {
-        Position pos = block.getPosition();
-        if (getBlockAt(pos) == null) {
-            return;
-        } else {
-            blocks[pos.getX()][pos.getY()] = null;
-        }
+        removeBlockAt(block.getPosition());
     }
 
-    /**
-     * Removes block from world at the given position.
-     * 
-     * @param position
-     * @return True if given position is valid, false otherwise.
-     */
     @Override
     public boolean removeBlockAt(Position position) {
         if (!isValidPosition(position)) {
@@ -139,9 +121,21 @@ public class World implements IWorld {
         return true;
     }
 
-    @Deprecated
-    private boolean isValidPosition(int x, int y) {
-        return x >= 0 && y >= 0 && x < width && y < height;
+    @Override
+    public boolean moveBlock(Block block, Position newPosition) {
+        if (!isValidPosition(newPosition)) {
+            return false;
+        }
+
+        Position currentPosition = block.getPosition();
+        if (isValidPosition(currentPosition)) {
+            removeBlockAtNoCheck(currentPosition);
+        }
+
+        setBlockAtNoCheck(newPosition, block);
+        block.setPosition(newPosition);
+
+        return true;
     }
 
     private boolean isValidPosition(Position position) {
@@ -155,7 +149,6 @@ public class World implements IWorld {
 
     private void setBlockAtNoCheck(Position position, Block block) {
         blocks[position.getX()][position.getY()] = block;
-        block.move(position);
     }
 
     private boolean hasBlockAtNoCheck(Position position) {

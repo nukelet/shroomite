@@ -1,12 +1,10 @@
 package com.javasegfault.shroomite.blocks;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.javasegfault.shroomite.blocks.BlockType;
-import com.javasegfault.shroomite.World;
+import com.javasegfault.shroomite.IWorld;
 import com.javasegfault.shroomite.util.Position;
 
 public abstract class Block implements IBlock {
-    protected World world;
+    protected IWorld world;
 	protected Position position;
     protected IBlockVisitor visitor;
 
@@ -18,23 +16,21 @@ public abstract class Block implements IBlock {
     public boolean rigid = false;
     public boolean solid = true;
     public boolean liquid = false;
-	
-	public Block(Position position, World world) {
+
+	public Block(Position position, IWorld world) {
 		this.position = position;
         this.world = world;
     }
 
+    @Override
     public Position getPosition() {
         return this.position;
     }
 
-    private void setPosition(Position pos) {
-        this.position = pos;
+    @Override
+    public void setPosition(Position position) {
+        this.position = position;
     }
-	
-	public abstract BlockType getType();
-	
-	public abstract Texture getTexture();
 
     // TODO: this should probably be delegated to the graphics component
     // maybe the block should only store a reference to a TextureName object
@@ -46,14 +42,16 @@ public abstract class Block implements IBlock {
 
     }
 
-    public abstract void accept(IBlockVisitor visitor);
-
+    @Override
     public void destroySelf() {
-        world.removeBlock(this);
+        world.removeBlockAt(position);
     }
 
-    public abstract void interact(Block block);
-
+    /**
+     * Deprecated because it checks for the absence of block with a direct
+     * comparison to null, breaking the abstraction for absence of blocks.
+     */
+    @Deprecated
     public void interactBlock(Block block) {
         if (block == null) {
             return;
@@ -62,9 +60,10 @@ public abstract class Block implements IBlock {
         }
     };
 
+    @Override
     public void move(Position pos) {
-        world.removeBlock(this);
-        setPosition(pos);
-        world.addBlock(this);
+        world.moveBlock(this, pos);
     }
+
+    public abstract void interact(Block block);
 }

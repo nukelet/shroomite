@@ -1,7 +1,7 @@
 package com.javasegfault.shroomite.physics;
 
 import com.badlogic.gdx.utils.ObjectSet;
-import com.javasegfault.shroomite.World;
+import com.javasegfault.shroomite.IWorld;
 import com.javasegfault.shroomite.blocks.Block;
 import com.javasegfault.shroomite.blocks.IBlockVisitor;
 import com.javasegfault.shroomite.blocks.DirtBlock;
@@ -13,8 +13,8 @@ import com.javasegfault.shroomite.blocks.WaterBlock;
 import com.javasegfault.shroomite.blocks.WoodBlock;
 import com.javasegfault.shroomite.util.Position;
 
-public class UpdateBlockPositionVisitor implements IBlockVisitor { 
-    private World world;
+public class UpdateBlockPositionVisitor implements IBlockVisitor {
+    private IWorld world;
     private ObjectSet<LiquidBlock> newLiquidBlocks;
 
     public UpdateBlockPositionVisitor(Physics physics) {
@@ -33,14 +33,21 @@ public class UpdateBlockPositionVisitor implements IBlockVisitor {
     private void updateSandBlock(SandBlock block) {
         Position pos = block.getPosition();
         Position posDown = pos.down();
-        Position posDownLeft = posDown.left();
-        Position posDownRight = posDown.right();  
         if (!world.hasBlockAt(posDown)) {
             block.move(posDown);
-        } else if (!world.hasBlockAt(posDownLeft)) {
+            return;
+        }
+
+        Position posDownLeft = posDown.left();
+        if (!world.hasBlockAt(posDownLeft)) {
             block.move(posDownLeft);
-        } else if (!world.hasBlockAt(posDownRight)) {
+            return;
+        }
+
+        Position posDownRight = posDown.right();
+        if (!world.hasBlockAt(posDownRight)) {
             block.move(posDownRight);
+            return;
         }
     }
 
@@ -66,9 +73,8 @@ public class UpdateBlockPositionVisitor implements IBlockVisitor {
         Block blockDown = world.getBlockAt(posDown);
         if (blockDown.getType() == block.getType()) {
             LiquidBlock otherLiquidBlock = (LiquidBlock) blockDown;
-            int otherLiquidBlockMassFree = otherLiquidBlock.getMaxMass() - otherLiquidBlock.getMass();
-            int flowMass = Math.min(otherLiquidBlockMassFree, block.getMass());
-            block.removeMass(flowMass); 
+            int flowMass = Math.min(otherLiquidBlock.getMassFree(), block.getMass());
+            block.removeMass(flowMass);
             otherLiquidBlock.addMass(flowMass);
         }
 

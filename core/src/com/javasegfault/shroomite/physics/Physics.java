@@ -1,21 +1,19 @@
 package com.javasegfault.shroomite.physics;
 
-import com.javasegfault.shroomite.agents.Agent;
-import com.javasegfault.shroomite.agents.PlayerAgent;
-import com.javasegfault.shroomite.blocks.Block;
-import com.javasegfault.shroomite.blocks.WaterBlock;
-import com.javasegfault.shroomite.util.Position;
-import com.javasegfault.shroomite.World;
-import com.javasegfault.shroomite.blocks.BlockType;
-import com.javasegfault.shroomite.blocks.IBlockVisitor;
-import com.javasegfault.shroomite.blocks.LiquidBlock;
-import com.javasegfault.shroomite.Shroomite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.javasegfault.shroomite.IWorld;
+import com.javasegfault.shroomite.Shroomite;
+import com.javasegfault.shroomite.agents.Agent;
+import com.javasegfault.shroomite.agents.PlayerAgent;
+import com.javasegfault.shroomite.blocks.Block;
+import com.javasegfault.shroomite.blocks.IBlockVisitor;
+import com.javasegfault.shroomite.blocks.LiquidBlock;
+import com.javasegfault.shroomite.util.Position;
 
 public class Physics {
-    public World world;
+    public IWorld world;
 
     public ObjectSet<LiquidBlock> newLiquidBlocks;
     Array<Block> collidingBlocks;
@@ -24,7 +22,7 @@ public class Physics {
 
     public float gravity = -1000f;
 
-    public Physics(World world) {
+    public Physics(IWorld world) {
         this.world = world;
         this.newLiquidBlocks = new ObjectSet<LiquidBlock>();
         this.updateBlockPositionVisitor = new UpdateBlockPositionVisitor(this);
@@ -34,18 +32,28 @@ public class Physics {
     public void updateInteractions() {
         for (int x = 0; x < world.getWidth(); x++) {
             for (int y = 0; y < world.getHeight(); y++) {
-                Block block = world.getBlockAt(x, y);
-
-                if (block == null) {
+                Position pos = new Position(x, y);
+                if (!world.hasBlockAt(pos)) {
                     continue;
                 }
 
-                Position pos = block.getPosition();
-
-                block.interactBlock(world.getBlockAt(pos.up()));
-                block.interactBlock(world.getBlockAt(pos.down()));
-                block.interactBlock(world.getBlockAt(pos.left()));
-                block.interactBlock(world.getBlockAt(pos.right()));
+                Block block = world.getBlockAt(pos);
+                Position posUp = pos.up();
+                if (world.hasBlockAt(posUp)) {
+                    block.interact(world.getBlockAt(posUp));
+                }
+                Position posDown = pos.down();
+                if (world.hasBlockAt(posDown)) {
+                    block.interact(world.getBlockAt(posDown));
+                }
+                Position posLeft = pos.left();
+                if (world.hasBlockAt(posLeft)) {
+                    block.interact(world.getBlockAt(posLeft));
+                }
+                Position posRight = pos.right();
+                if (world.hasBlockAt(posRight)) {
+                    block.interact(world.getBlockAt(posRight));
+                }
             }
         }
     }
@@ -54,14 +62,14 @@ public class Physics {
         newLiquidBlocks.clear();
         for (int x = 0; x < world.getWidth(); x++) {
             for  (int y = 0; y < world.getHeight(); y++) {
-                Block block = world.getBlockAt(x, y);
-
-                if (block == null) {
+                Position pos = new Position(x, y);
+                if (!world.hasBlockAt(pos)) {
                     continue;
-                } else {
-                    // System.out.println(block);
                 }
-                
+
+                Block block = world.getBlockAt(pos);
+                // System.out.println(block);
+
                 // TODO: i suppose this could be broken down into functions
                 // really gotta come up with a way to organize this in a way
                 // that makes it scalable i guess
@@ -94,21 +102,19 @@ public class Physics {
     }
 
     public void updateCollidingBlocks(Agent agent) {
-        Vector2 pos = agent.getPosition();
-
         collidingBlocks.clear();
 
-        // bottom left corner coordinates
-        int gridPosX0 = (int) (pos.x/(float) Shroomite.BLOCK_WIDTH);
-        int gridPosY0 = (int) (pos.y/(float) Shroomite.BLOCK_HEIGHT);
-        // top right corner coordinates
-        int gridPosX1 = (int) ((pos.x + agent.getWidth())/(float) Shroomite.BLOCK_WIDTH);
-        int gridPosY1 = (int) ((pos.y + agent.getHeight())/(float) Shroomite.BLOCK_HEIGHT);
+        Vector2 agentPosition = agent.getPosition();
+        int agentBottomLeftGridPositionX = (int) (agentPosition.x / Shroomite.BLOCK_WIDTH);
+        int agentBottomLeftGridPositionY = (int) (agentPosition.y / Shroomite.BLOCK_HEIGHT);
+        int agentTopRightGridPositionX = (int) ((agentPosition.x + agent.getWidth()) / Shroomite.BLOCK_WIDTH);
+        int agentTopRightGridPositionY = (int) ((agentPosition.y + agent.getHeight()) / Shroomite.BLOCK_HEIGHT);
 
-        for (int x = gridPosX0; x <= gridPosX1; x++) {
-            for (int y = gridPosY0; y <= gridPosY1; y++) {
-                Block block = world.getBlockAt(x, y);
-                if (block != null) {
+        for (int x = agentBottomLeftGridPositionX; x <= agentTopRightGridPositionX; x++) {
+            for (int y = agentBottomLeftGridPositionY; y <= agentTopRightGridPositionY; y++) {
+                Position pos = new Position(x, y);
+                if (world.hasBlockAt(pos)) {
+                    Block block = world.getBlockAt(pos);
                     collidingBlocks.add(block);
                 }
             }

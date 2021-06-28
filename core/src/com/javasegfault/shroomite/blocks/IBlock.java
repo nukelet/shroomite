@@ -1,21 +1,22 @@
 package com.javasegfault.shroomite.blocks;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.javasegfault.shroomite.blocks.BlockType;
 import com.javasegfault.shroomite.util.Position;
 
 public interface IBlock {
-    public Position getPosition();
+    Position getPosition();
 
-	public abstract BlockType getType();
-	
-	public abstract Texture getTexture();
+    void setPosition(Position position);
 
-    public void render();
+    BlockType getType();
 
-    public void destroySelf();
+    Texture getTexture();
 
-    public void move(Position pos);
+    void render();
 
-    public abstract void accept(IBlockVisitor visitor);
+    void destroySelf();
+
+    void move(Position pos);
+
+    void accept(IBlockVisitor visitor);
 }
