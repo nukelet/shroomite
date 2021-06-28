@@ -12,6 +12,8 @@ public class Lever extends UnlockableEntity {
         super(world, position);
         setHitboxSize(16, 16);
         setTextureSize(16, 16);
+        this.textureRect = hitbox;
+        // adjustTextureRect();
     }
 
     public void accept(IEntityVisitor visitor) {

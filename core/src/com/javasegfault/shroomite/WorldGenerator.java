@@ -93,7 +93,7 @@ public class WorldGenerator {
                 int x = Integer.parseInt(pos[0]);
                 int y = Integer.parseInt(pos[1]);
 
-                Vector2 position = new Vector2(x, y);
+                Vector2 position = new Vector2(x * Shroomite.BLOCK_WIDTH, y * Shroomite.BLOCK_HEIGHT);
 
                 switch (blockType) {
                     case "LEVER":
