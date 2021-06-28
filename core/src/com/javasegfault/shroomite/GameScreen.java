@@ -309,15 +309,17 @@ public class GameScreen extends ScreenAdapter {
 //            System.out.println("x = " + mousePos.x + ", y = " + mousePos.y);
             int mouseWorldPosX = (int) (mousePos.x / BLOCK_WIDTH);
             int mouseWorldPosY = (int) (mousePos.y / BLOCK_HEIGHT);
-            Position mouseWorldPos = new Position(mouseWorldPosX, mouseWorldPosY);
 
             if (currentTime - lastMousePressTime > 500) {
                 System.out.println("world coordinates: x = " + mouseWorldPosX + ", y = " + mouseWorldPosY);
                 Position mouseWorldPosition = new Position(mouseWorldPosX, mouseWorldPosY);
-                Block block = world.getBlockAt(mouseWorldPosition);
-                System.out.println(block);
+                if (world.hasBlockAt(mouseWorldPosition)) {
+                    Block block = world.getBlockAt(mouseWorldPosition);
+                    System.out.println(block);
+                    player.breakBlock(block);
+                }
+
                 lastMousePressTime = currentTime;
-                player.breakBlock(block);
 
                 // if (block != null && block.getType() == BlockType.WATER) {
                 //     Position pos = block.getPosition();
