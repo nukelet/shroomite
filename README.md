@@ -9,8 +9,6 @@ A estrutura aqui apresentada é uma simplificação daquela proposta pelo [Cooki
 │
 ├── data               <- dados usados pelo jogo (se houver)
 │
-├── notebooks          <- Jupyter notebooks ou equivalentes
-│
 ├── src                <- projeto em Java (preferencialmente projeto no Eclipse)
 │   │
 │   ├── src            <- arquivos-fonte do projeto (.java)
@@ -78,25 +76,48 @@ O jogo também possui um editor de salas que permite editar mapas para criar sal
 
 > <Relatório de evolução, descrevendo as evoluções do design do projeto, dificuldades enfrentadas, mudanças de rumo, melhorias e lições aprendidas. Referências aos diagramas e recortes de mudanças são bem-vindos.>
 
+Nós começamos com a ideia simples de ter um jogo inspirado em Terraria que tivesse vários tipos de blocos que interagem entre si e se comportam como autômatos celulares, e ao longo do desenvolvimento nós fomos adicionando coisas incrementalmente em cima dessa ideia.
+Acreditamos que esse processo incremental acabou gerando várias dificuldades que nos levaram a não ter tempo de adicionar algumas coisas que queríamos (como NPCs e um sistema de inventário pro player).
+O processo todo nos ensinou a importância de se fazer um plano de projeto cuidadoso com design de arquitetura e componentes bem definidos antes de se começar a escrever o código em si.
+
+Contudo, ao longo do caminho nós implementamos várias melhorias no projeto. Inicialmente não tínhamos interfaces bem-definidas e isso estava tornando difícil a implementação da física do jogo. Eventualmente nós criamos a separação entre os componentes de blocos e o componente que armazena/fornece acesso ao espaço celular de blocos, e isso facilitou significativamente o desenvolvimento.
+
+Também tínhamos problemas relacionados a fazer muitas checagens de tipo + typecasts e encontramos uma solução envolvendo o design pattern de Visitor, que tornou o código todo um pouco mais geral e diminuiu o acoplamento. 
+
 # Destaques de Código
 
-> <Escolha trechos relevantes e/ou de destaque do seu código. Apresente um recorte (você pode usar reticências para remover partes menos importantes). Veja como foi usado o highlight de Java para o código.>
-
+## Montagem do componente `Game`
 ~~~java
-// Recorte do seu código
-public void algoInteressante(…) {
-   …
-   trechoInteressante = 100;
-}
+    public GameScreen(final Shroomite game, final String worldName) {
+        this.game = game;
+
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false, 800, 600);
+
+        // libGDX looks for files in the core/assets/ folder
+        this.worldName = worldName;
+        WorldGenerator worldGenerator = new WorldGenerator("worlds/" + worldName);
+        world = worldGenerator.getWorld();
+        player = worldGenerator.getPlayer();
+        unlockableEntities = worldGenerator.getUnlockableEntities();
+        levelExit = worldGenerator.getLevelExit();
+
+        physics = new Physics(world);
 ~~~
 
+Esse recorte mostra como o componente `Game` é "montado": a classe `WorldGenerator` lê os arquivos `.grid` contendo a "serialização" dos mapas que foram feitos no editor e gera os diversos componentes a serem usados pelo jogo (o espaço celular `World`, as alavancas usadas pra desbloquear a saída, a saída do nível em si, o `Player` e o componente que implementa a física do jogo).
+
 # Destaques de Pattern
-`<Destaque de patterns adotados pela equipe. Sugestão de estrutura:>`
 
 ## Diagrama do Pattern
 `<Diagrama do pattern dentro do contexto da aplicação.>`
 
 ## Código do Pattern
+
+## Visitor
+
+![IBlockVisitor](reports/figures/IBlockVisitor.png)
+
 ~~~java
 // Recorte do código do pattern seguindo as mesmas diretrizes de outros destaques
 public void algoInteressante(…) {
