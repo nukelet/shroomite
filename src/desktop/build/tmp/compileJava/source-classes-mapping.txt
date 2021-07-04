@@ -1,0 +1,2 @@
+com/javasegfault/shroomite/desktop/DesktopLauncher.java
+ com.javasegfault.shroomite.desktop.DesktopLauncher
