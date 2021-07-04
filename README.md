@@ -1,45 +1,3 @@
-# Modelo de Apresentação do Projeto
-
-# Estrutura de Arquivos e Pastas
-
-A estrutura aqui apresentada é uma simplificação daquela proposta pelo [Cookiecutter Data Science](https://drivendata.github.io/cookiecutter-data-science/). Também será aceito que o projeto adote a estrutura completa do Cookiecutter Data Science e isso será considerado um diferencial. A estrutura geral é a seguinte e será detalhada a seguir:
-
-~~~
-├── README.md          <- apresentação do projeto
-│
-├── data               <- dados usados pelo jogo (se houver)
-│
-├── src                <- projeto em Java (preferencialmente projeto no Eclipse)
-│   │
-│   ├── src            <- arquivos-fonte do projeto (.java)
-│   │
-│   ├── bin            <- arquivos em bytecode (.class)
-│   │
-│   └── README.md      <- instruções básicas de instalação/execução
-│
-└── assets             <- mídias usadas no projeto
-~~~
-
-Na raiz deve haver um arquivo de nome `README.md` contendo a apresentação do projeto, como detalhado na seção seguinte.
-
-## `data`
-
-Arquivos de dados usados no projeto, quando isso ocorrer. Por exemplo, se o jogo lê mapas de labirintos que estão em arquivo-texto, coloque os arquivos aqui (mesmo que você mantenha uma cópia no diretório do código).
-
-## `notebooks`
-
-Testes ou prototipos relacionados ao projeto que tenham sido executados no Jupyter. Por exemplo, coloque aqui uma cópia dos testes feitos nas Exceptions.
-
-## `src`
-
-Projeto em Java, preferencialmente em Eclipse, incluindo todos os arquivos de dados e bibliotecas necessários para a sua execução. Dentro dessa pasta sugerimos que você mantenha uma estrutura equivalente ao Eclipse, com uma subpasta `src` onde estarão os fontes e outra subpasta `bin` onde estarão os bytecodes.
-
- Acrescente na raiz um arquivo `README.md` com as instruções básicas de instalação e execução.
-
-## `assets`
-
-Qualquer mídia usada no seu projeto: vídeo, imagens, animações, slides etc. Coloque os arquivos aqui (mesmo que você mantenha uma cópia no diretório do código).
-
 # Projeto: `Shroomite`
 
 # Descrição Resumida do Projeto/Jogo
@@ -51,48 +9,83 @@ Cada sala contém uma porta (inicialmente trancada) e um conjunto de alavancas q
 A principal entidade do jogo é o Jogador, que é controlado pelo usuário e se move pelas salas com o objetivo de destrancar a saída após interagir com todas as alavanças da sala, evitando perder pontos de vida ao interagir com os blocos e entidades da sala.
 O jogo também possui um editor de salas que permite editar mapas para criar salas customizadas.
 
+## Agradecimentos
+
+Gostaríamos de agradecer a toda a comunidade do framework [libGDX](https://libgdx.com/), responsável por manter e documentar o framework gráfico que usamos nesse projeto. 
+
+Também queremos agradecer o usuário [0x72](https://0x72.itch.io/) por disponibilizar gratuitamente o asset pack [DungeonTilesetII](https://0x72.itch.io/dungeontileset-ii).
+
 # Equipe
-* `<nome completo>` - `<RA>`
+- Vinícius de Oliveira Peixoto Rodrigues (245294)
+- Gabriel Lucio de Araujo (172233)
 
 # Vídeos do Projeto
 
 ## Vídeo da Prévia
-> <Coloque um link para o vídeo da prévia do projeto.>
+[Link para o vídeo](https://drive.google.com/file/d/1eUm_f_Y6o4uk_PdVsud_TnUS8_cvRJDK/view?usp=sharing)
 
 ## Vídeo do Jogo
-> <Coloque um link para o vídeo em que é demonstrada a versão final do jogo. Esse vídeo deve ter em torno de 5 minutos. Este vídeo não apresenta slides, nem substitui a apresentação final do projeto, que será feita por conferência. Ele mostra apenas o jogo em funcionamento.>
-
-[Link](https://drive.google.com/file/d/1kvasaeyAL6Wu9tF9zHQYZ0WG8isFhKqq/view?usp=sharing)
+[Link para o vídeo](https://drive.google.com/file/d/1kvasaeyAL6Wu9tF9zHQYZ0WG8isFhKqq/view?usp=sharing)
 
 # Slides do Projeto
 
 ## Slides da Prévia
-`<Coloque um link para os slides da prévia do projeto.>`
+[Link para os slides](https://drive.google.com/file/d/1mho5to0dcvyb34_1SnJQUrX4QIbrx_Vs/view?usp=sharing)
 
 ## Slides da Apresentação Final
-`<Coloque um link para os slides da apresentação final do projeto.>`
+[Link para os slides](https://docs.google.com/presentation/d/1sFedvZxpM2xsTM8zwWL0CVoQeUwDSvinKGh3GqLZrtg/edit)
+
+# Estrutura de Arquivos e Pastas
+
+~~~
+├── README.md                   <- apresentação do projeto
+│
+├── data                        <- dados usados pelo jogo (mapas)
+│
+├── src
+│   │
+│   ├── build.gradle
+│   ├── core                    <- código fonte do jogo em si
+│   │   ├── assets
+│   │   ├── build
+│   │   ├── build.gradle
+│   │   └── src
+│   ├── desktop                 <- código que controla a execução do jogo no ambiente desktop
+│   │   ├── build                  (tamanho da janela, resolução, framerate, etc)
+│   │   ├── build.gradle
+│   │   └── src
+│   ├── gradle
+│   │   └── wrapper
+│   ├── gradle.properties
+│   ├── gradlew
+│   ├── gradlew.bat
+│   └── settings.gradle
+│
+├── reports                     <- imagens utilizadas no relatório/documentação do README.md
+│
+└── assets                      <- mídias usadas no projeto (sprites)
+~~~
+
+A estrutura de pastas dentro de `src/` é gerada automaticamente pelo wizard de configuração do framework gráfico que usamos e faz uso da ferramenta [Gradle](https://gradle.org/) para buildar o projeto.
+Os binários se encontram dentro das pastas `build` em `src/core` e `src/desktop`.
 
 ## Relatório de Evolução
-
-> <Relatório de evolução, descrevendo as evoluções do design do projeto, dificuldades enfrentadas, mudanças de rumo, melhorias e lições aprendidas. Referências aos diagramas e recortes de mudanças são bem-vindos.>
 
 Nós começamos com a ideia simples de ter um jogo inspirado em Terraria que tivesse vários tipos de blocos que interagem entre si e se comportam como autômatos celulares, e ao longo do desenvolvimento nós fomos adicionando coisas incrementalmente em cima dessa ideia.
 Acreditamos que esse processo incremental acabou gerando várias dificuldades que nos levaram a não ter tempo de adicionar algumas coisas que queríamos (como NPCs e um sistema de inventário pro player).
 O processo todo nos ensinou a importância de se fazer um plano de projeto cuidadoso com design de arquitetura e componentes bem definidos antes de se começar a escrever o código em si.
 
-Contudo, ao longo do caminho nós implementamos várias melhorias no projeto. Inicialmente não tínhamos interfaces bem-definidas e isso estava tornando difícil a implementação da física do jogo. Eventualmente nós criamos a separação entre os componentes de blocos e o componente que armazena/fornece acesso ao espaço celular de blocos, e isso facilitou significativamente o desenvolvimento.
+Contudo, ao longo do caminho nós implementamos várias melhorias no projeto. Inicialmente não tínhamos interfaces bem definidas e isso estava tornando difícil a implementação da física do jogo. Eventualmente nós criamos a separação entre os componentes de blocos e o componente que armazena/fornece acesso ao espaço celular de blocos, e isso facilitou significativamente o desenvolvimento.
 
 Também tínhamos problemas relacionados a fazer muitas checagens de tipo + typecasts e encontramos uma solução envolvendo o design pattern de Visitor, que tornou o código todo um pouco mais geral e diminuiu o acoplamento. 
+
 
 # Destaques de Código
 
 ## Montagem do componente `Game`
 ~~~java
     public GameScreen(final Shroomite game, final String worldName) {
-        this.game = game;
-
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 600);
+        ...
 
         // libGDX looks for files in the core/assets/ folder
         this.worldName = worldName;
@@ -103,34 +96,130 @@ Também tínhamos problemas relacionados a fazer muitas checagens de tipo + type
         levelExit = worldGenerator.getLevelExit();
 
         physics = new Physics(world);
+        
+        ...
+    }
 ~~~
 
-Esse recorte mostra como o componente `Game` é "montado": a classe `WorldGenerator` lê os arquivos `.grid` contendo a "serialização" dos mapas que foram feitos no editor e gera os diversos componentes a serem usados pelo jogo (o espaço celular `World`, as alavancas usadas pra desbloquear a saída, a saída do nível em si, o `Player` e o componente que implementa a física do jogo).
+Esse recorte mostra como o componente `Game` é "montado" a partir dos outros componentes: a classe `WorldGenerator` lê os arquivos `.grid` contendo a "serialização" dos mapas que foram feitos no editor e gera os diversos componentes a serem usados pelo jogo (o espaço celular `World`, as alavancas usadas pra desbloquear a saída, a saída do nível em si, o `Player` e o componente que implementa a física do jogo).
+
+## Controle de estado do jogo
+
+O fragmento de código abaixo, presente no componente `Game` (`com.javasegfault.shroomite.GameScreen`) ilustra basicamente a lógica inteira de atualização do estado do jogo realizada a cada frame:
+
+~~~java
+    @Override
+    public void render(float delta) {
+        // processes player input
+        handleInput();
+        
+        // updates the blocks (every 17ms, i.e. 60 times per second)
+        if (TimeUtils.timeSinceMillis(lastPhysicsCallTime) > 17) {
+            physics.updatePositions();
+            physics.updateInteractions();
+            lastPhysicsCallTime = TimeUtils.millis();
+        }
+
+        physics.updatePlayer(player, delta);
+
+        // makes the player interact with levers
+        for (UnlockableEntity entity : unlockableEntities) {
+            if (player.overlaps(entity)) {
+                player.interact(entity);
+            }
+        }
+
+        // checks if all the levers (and thus the level exit) are unlocked
+        boolean isDoorUnlocked = true;
+        for (UnlockableEntity entity : unlockableEntities) {
+            if (entity.isLocked()) {
+                isDoorUnlocked = false;
+                break;
+            }
+        }
+
+        // checks if the player can exit and is colliding with the exit
+        if (isDoorUnlocked && player.overlaps(levelExit)) {
+            if (gameState != GameState.LEVEL_COMPLETE) {
+                gameState = GameState.LEVEL_COMPLETE;
+            }
+        }
+
+        // game over if the player health drops below 0
+        if (player.getHp() < 0) {
+            if (gameState != GameState.GAME_OVER) {
+                gameState = GameState.GAME_OVER;
+            }
+        }
+    }
+~~~
+
 
 # Destaques de Pattern
 
-## Diagrama do Pattern
-`<Diagrama do pattern dentro do contexto da aplicação.>`
-
-## Código do Pattern
-
 ## Visitor
 
-![IBlockVisitor](reports/figures/IBlockVisitor.png)
+### Diagrama do Pattern
+![VisitorPattern](reports/figures/VisitorPattern.png)
+
+### Código do Pattern
 
 ~~~java
-// Recorte do código do pattern seguindo as mesmas diretrizes de outros destaques
-public void algoInteressante(…) {
-   …
-   trechoInteressante = 100;
+public interface IBlockVisitor {
+    void visitRockBlock(RockBlock block);
+    void visitWaterBlock(WaterBlock block);
+    void visitDirtBlock(DirtBlock block);
+    void visitLavaBlock(LavaBlock block);
+    void visitWoodBlock(WoodBlock block);
+    void visitSandBlock(SandBlock block);
 }
 ~~~
 
-> <Explicação de como o pattern foi adotado e quais suas vantagens, referenciando o diagrama.>
+~~~java
+public class UpdateBlockPositionVisitor implements IBlockVisitor {
+    private void updateMovableBlock(Block block) {
+        ...
+    }
+
+    private void updateSandBlock(SandBlock block) {
+        ...
+    }
+
+    private void updateLiquidBlock(LiquidBlock block) {
+        ...
+    }
+
+    public void visitWaterBlock(WaterBlock block) {
+        updateLiquidBlock(block);
+    }
+
+    public void visitLavaBlock(LavaBlock block) {
+        updateLiquidBlock(block);
+    }
+
+    public void visitSandBlock(SandBlock block) {
+        updateSandBlock(block);
+    }
+    
+    ...
+}
+~~~
+
+Implementamos o design pattern [Visitor](https://refactoring.guru/design-patterns/visitor) no componente `Physics` para separar os algoritmos que atualizam o estado dos blocos (simulação de areia caindo, simulação de líquidos, etc) dos objetos em si. O componente `Physics` recebe por meio da interface `IWorld` os objetos `Block` que se encontram em uma dada posição, mas ele precisa saber o tipo dos blocos para decidir como atualizar os seus estados.
+Em vez de guardar um `enum` com os tipos de cada bloco e fazer um grande `switch/case` seguido de vários typecasts (de `Block` para as classes herdeiras), decidimos implementar esse design pattern, onde o bloco em si é responsável por chamar a função adequada da interface `Visitor`. Por exemplo, para o bloco `WaterBlock`:
+
+~~~java
+@Override
+public void accept(IBlockVisitor visitor) {
+    visitor.visitWaterBlock(this);
+}
+~~~
 
 # Conclusões e Trabalhos Futuros
 
-> <Apresente aqui as conclusões do projeto e propostas de trabalho futuro. Esta é a oportunidade em que você pode indicar melhorias no projeto a partir de lições aprendidas e conhecimentos adquiridos durante a realização do projeto, mas que não puderam ser implementadas por questões de tempo. Por exemplo, há design patterns aprendidos no final do curso que provavelmente não puderam ser implementados no jogo -- este é o espaço onde você pode apresentar como aplicaria o pattern no futuro para melhorar o jogo.>
+Uma das melhorias que nós tínhamos em mente desde o começo do projeto era implementar um sistema de inventário para o jogador. Com a arquitetura que desenvolvemos até agora isso poderia ser implementado facilmente desde que se fizesse uma separação entre o armazenamento de blocos e de outros itens que não são blocos (como uma picareta, poções de cura, etc).
+
+Outra melhoria seria a implementação de NPCs, que também seria relativamente simples (visto que é possível extrair facilmente uma interface `IAgent` da classe `PlayerAgent` que expõe as funções básicas que um agente do jogo precisa ter, como a habilidade de se mover, interagir com blocos e outras entidades, etc).
 
 # Documentação dos Componentes
 
@@ -243,7 +332,7 @@ item | detalhamento
 Pacote  | `com.badlogic.gdx`
 Classes | `ScreenAdapter`
 Autores | - 
-[Interfaces](Interfaces) | `Screen`
+Interfaces | `Screen`
 
 ### Interfaces
 
@@ -368,20 +457,3 @@ Método | Objetivo
 `hasBlockAt`        | Verifica se há um bloco na posição dada. Retorna falso caso a posição seja inválida.
 `removeBlockAt`     | Remove um bloco na posição dada. Retorna falso caso a posição seja inválida ou esteja vazia.
 `moveBlock`         | Move um bloco para a posição dada caso ela esteja vazia e seja válida. Retorna falso caso não seja possível adicionar.
-
-# Plano de Exceções
-
-## Diagrama da hierarquia de exceções
-`<Elabore um diagrama com a hierarquia de exceções como detalhado abaixo>`
-
-![Hierarquia Exceções](exception-hierarchy.png)
-
-## Descrição das classes de exceção
-
-`<Monte uma tabela descritiva seguindo o exemplo>:`
-
-Classe | Descrição
------ | -----
-DivisaoInvalida | Engloba todas as exceções de divisões não aceitas.
-DivisaoInutil | Indica que a divisão por 1 é inútil.
-DivisaoNaoInteira [|](|) Indica uma divisão não inteira.
